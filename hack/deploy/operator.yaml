@@ -112,6 +112,7 @@ webhooks:
   - operations:
     - CREATE
     - UPDATE
+    - DELETE
     apiGroups:
     - kubedb.com
     apiVersions:
