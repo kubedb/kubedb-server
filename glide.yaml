@@ -34,8 +34,6 @@ import:
   repo: https://github.com/appscode/go-version.git
   vcs: git
   version: master
-- package: github.com/openshift/generic-admission-server
-  version: master
 testImport:
 - package: github.com/onsi/ginkgo
   version: v1.4.0

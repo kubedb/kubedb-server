@@ -1,10 +1,10 @@
 ## apiserver run
 
-Launch KubeDB admission webhook server
+Launch KubeDB apiserver
 
 ### Synopsis
 
-Launch KubeDB admission webhook server
+Launch KubeDB apiserver
 
 ```
 apiserver run [flags]
@@ -19,12 +19,6 @@ apiserver run [flags]
       --audit-log-maxsize int                                   The maximum size in megabytes of the audit log file before it gets rotated.
       --audit-log-path string                                   If set, all requests coming to the apiserver will be logged to this file.  '-' means standard out.
       --audit-policy-file string                                Path to the file that defines the audit policy configuration. Requires the 'AdvancedAuditing' feature gate. With AdvancedAuditing, a profile is required to enable auditing.
-      --audit-webhook-batch-buffer-size int                     The size of the buffer to store events before batching and sending to the webhook. Only used in batch mode. (default 10000)
-      --audit-webhook-batch-initial-backoff duration            The amount of time to wait before retrying the first failed requests. Only used in batch mode. (default 10s)
-      --audit-webhook-batch-max-size int                        The maximum size of a batch sent to the webhook. Only used in batch mode. (default 400)
-      --audit-webhook-batch-max-wait duration                   The amount of time to wait before force sending the batch that hadn't reached the max size. Only used in batch mode. (default 30s)
-      --audit-webhook-batch-throttle-burst int                  Maximum number of requests sent at the same moment if ThrottleQPS was not utilized before. Only used in batch mode. (default 15)
-      --audit-webhook-batch-throttle-qps float32                Maximum average number of requests per second. Only used in batch mode. (default 10)
       --audit-webhook-config-file string                        Path to a kubeconfig formatted file that defines the audit webhook configuration. Requires the 'AdvancedAuditing' feature gate.
       --audit-webhook-mode string                               Strategy for sending audit events. Blocking indicates sending events should block server responses. Batch causes the webhook to buffer and send events asynchronously. Known modes are batch,blocking. (default "batch")
       --authentication-kubeconfig string                        kubeconfig file pointing at the 'core' kubernetes server with enough rights to create tokenaccessreviews.authentication.k8s.io.

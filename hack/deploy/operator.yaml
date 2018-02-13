@@ -1,7 +1,7 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: kubedb-webhook
+  name: kubedb-apiserver
   namespace: $KUBEDB_NAMESPACE
   labels:
     app: kubedb
@@ -19,7 +19,7 @@ spec:
     spec:
       serviceAccountName: $KUBEDB_SERVICE_ACCOUNT
       containers:
-      - name: webhook
+      - name: apiserver
         args:
         - apiserver
         - --secure-port=8443
@@ -64,7 +64,7 @@ data:
 apiVersion: v1
 kind: Service
 metadata:
-  name: kubedb-webhook
+  name: kubedb-apiserver
   namespace: $KUBEDB_NAMESPACE
   labels:
     app: kubedb
@@ -89,34 +89,100 @@ spec:
   groupPriorityMinimum: 1000
   versionPriority: 15
   service:
-    name: kubedb-webhook
+    name: kubedb-apiserver
     namespace: $KUBEDB_NAMESPACE
   version: v1alpha1
 ---
 # register to intercept kubedb CRD creates / updates
-apiVersion: admissionregistration.k8s.io/v1beta1
-kind: ValidatingWebhookConfiguration
-metadata:
-  name: admission.kubedb.com
-  labels:
-    app: kubedb
 webhooks:
-- name: admission.kubedb.com
+- name: elasticsearch.admission.kubedb.com
   clientConfig:
     service:
       namespace: default
       name: kubernetes
-      path: /apis/admission.kubedb.com/v1alpha1/reviews
-    caBundle: $KUBE_CA
+      path: /apis/admission.kubedb.com/v1alpha1/elasticsearchreviews
+    caBundle: ${KUBE_CA}
   rules:
-  - operations:
-    - CREATE
-    - UPDATE
-    - DELETE
-    apiGroups:
-    - kubedb.com
-    apiVersions:
-    - "*"
-    resources:
-    - "*"
+  - apiGroups: ["kubedb.com"]
+    apiVersions: ["*"]
+    resources: ["elasticsearchs"]
+    operations: ["CREATE", "UPDATE", "DELETE"]
+  failurePolicy: Fail
+- name: postgres.admission.kubedb.com
+  clientConfig:
+    service:
+      namespace: default
+      name: kubernetes
+      path: /apis/admission.kubedb.com/v1alpha1/postgresreviews
+    caBundle: ${KUBE_CA}
+  rules:
+  - apiGroups: ["kubedb.com"]
+    apiVersions: ["*"]
+    resources: ["postgreses"]
+    operations: ["CREATE", "UPDATE", "DELETE"]
+  failurePolicy: Fail
+- name: mysql.admission.kubedb.com
+  clientConfig:
+    service:
+      namespace: default
+      name: kubernetes
+      path: /apis/admission.kubedb.com/v1alpha1/mysqlreviews
+    caBundle: ${KUBE_CA}
+  rules:
+  - apiGroups: ["kubedb.com"]
+    apiVersions: ["*"]
+    resources: ["mysqls"]
+    operations: ["CREATE", "UPDATE", "DELETE"]
+  failurePolicy: Fail
+- name: mongodb.admission.kubedb.com
+  clientConfig:
+    service:
+      namespace: default
+      name: kubernetes
+      path: /apis/admission.kubedb.com/v1alpha1/mongodbreviews
+    caBundle: ${KUBE_CA}
+  rules:
+  - apiGroups: ["kubedb.com"]
+    apiVersions: ["*"]
+    resources: ["mongodbs"]
+    operations: ["CREATE", "UPDATE", "DELETE"]
+  failurePolicy: Fail
+- name: redis.admission.kubedb.com
+  clientConfig:
+    service:
+      namespace: default
+      name: kubernetes
+      path: /apis/admission.kubedb.com/v1alpha1/redisreviews
+    caBundle: ${KUBE_CA}
+  rules:
+  - apiGroups: ["kubedb.com"]
+    apiVersions: ["*"]
+    resources: ["redises"]
+    operations: ["CREATE", "UPDATE", "DELETE"]
+  failurePolicy: Fail
+- name: memcached.admission.kubedb.com
+  clientConfig:
+    service:
+      namespace: default
+      name: kubernetes
+      path: /apis/admission.kubedb.com/v1alpha1/memcachedreviews
+    caBundle: ${KUBE_CA}
+  rules:
+  - apiGroups: ["kubedb.com"]
+    apiVersions: ["*"]
+    resources: ["memcacheds"]
+    operations: ["CREATE", "UPDATE", "DELETE"]
+  failurePolicy: Fail
+- name: snapshot.admission.kubedb.com
+  clientConfig:
+    service:
+      namespace: default
+      name: kubernetes
+      path: /apis/admission.kubedb.com/v1alpha1/snapshotreviews
+    caBundle: ${KUBE_CA}
+  rules:
+  - apiGroups: ["kubedb.com"]
+    apiVersions: ["*"]
+    resources: ["snapshots"]
+    operations: ["CREATE", "UPDATE"]
   failurePolicy: Fail

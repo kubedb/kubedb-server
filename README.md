@@ -3,10 +3,10 @@
 [Website](https://kubedb.com) • [Slack](http://slack.kubernetes.io) • [Twitter](https://twitter.com/KubeDB)
 
 # apiserver
-Admission webhook for KubeDB
+KubeDB api server
 
 ## Installation
-To install KubeDB, please follow the guide [here](https://kubedb.com/docs/latest/setup/install/). To install the admission webhook, run the following command:
+To install KubeDB, please follow the guide [here](https://kubedb.com/docs/latest/setup/install/). To install the apiserver, run the following command:
 
 ```console
 curl https://raw.githubusercontent.com/kubedb/apiserver/master/hack/deploy/webhook.sh | bash -s -- --rbac

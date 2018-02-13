@@ -47,10 +47,6 @@ var clientCertificateExpirationHistogram = prometheus.NewHistogram(
 			(2 * 24 * time.Hour).Seconds(),
 			(4 * 24 * time.Hour).Seconds(),
 			(7 * 24 * time.Hour).Seconds(),
-			(30 * 24 * time.Hour).Seconds(),
-			(3 * 30 * 24 * time.Hour).Seconds(),
-			(6 * 30 * 24 * time.Hour).Seconds(),
-			(12 * 30 * 24 * time.Hour).Seconds(),
 		},
 	},
 )

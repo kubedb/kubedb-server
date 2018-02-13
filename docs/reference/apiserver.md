@@ -22,6 +22,6 @@
 
 ### SEE ALSO
 
-* [apiserver run](apiserver_run.md)	 - Launch KubeDB admission webhook server
+* [apiserver run](apiserver_run.md)	 - Launch KubeDB apiserver
 * [apiserver version](apiserver_version.md)	 - Prints binary version number.
 
