@@ -2,7 +2,7 @@
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
 metadata:
-  name: kubedb-admission-webhook-extension-server-authentication-reader
+  name: kubedb-apiserver-extension-server-authentication-reader
   namespace: kube-system
 roleRef:
   kind: Role
@@ -17,7 +17,7 @@ subjects:
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
-  name: kubedb-admission-webhook-auth-delegator
+  name: kubedb-apiserver-auth-delegator
   labels:
     app: kubedb
 roleRef:
@@ -33,7 +33,7 @@ subjects:
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
-  name: appscode:kubedb:admission-webhook-requester
+  name: appscode:kubedb:apiserver-requester
   labels:
     app: kubedb
 rules:
@@ -45,7 +45,7 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: appscode:kubedb:admission-webhook
+  name: appscode:kubedb:apiserver
   labels:
     app: kubedb
 rules:
@@ -64,13 +64,13 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: kubedb-admission-webhook
+  name: kubedb-apiserver
   labels:
     app: kubedb
 roleRef:
   kind: ClusterRole
   apiGroup: rbac.authorization.k8s.io
-  name: appscode:kubedb:admission-webhook
+  name: appscode:kubedb:apiserver
 subjects:
 - kind: ServiceAccount
   name: $KUBEDB_SERVICE_ACCOUNT

@@ -8,15 +8,15 @@ GOPATH=$(go env GOPATH)
 SRC=$GOPATH/src
 BIN=$GOPATH/bin
 ROOT=$GOPATH
-REPO_ROOT=$GOPATH/src/github.com/kubedb/admission-webhook
+REPO_ROOT=$GOPATH/src/github.com/kubedb/apiserver
 
 source "$REPO_ROOT/hack/libbuild/common/kubedb_image.sh"
 
 APPSCODE_ENV=${APPSCODE_ENV:-dev}
 DOCKER_REGISTRY=${DOCKER_REGISTRY:-kubedb}
-IMG=admission-webhook
+IMG=apiserver
 
-DIST=$GOPATH/src/github.com/kubedb/admission-webhook/dist
+DIST=$GOPATH/src/github.com/kubedb/apiserver/dist
 mkdir -p $DIST
 if [ -f "$DIST/.tag" ]; then
     export $(cat $DIST/.tag | xargs)
@@ -24,22 +24,22 @@ fi
 
 clean() {
     pushd $REPO_ROOT/hack/docker
-    rm -f admission-webhook Dockerfile
+    rm -f apiserver Dockerfile
     popd
 }
 
 build_binary() {
     pushd $REPO_ROOT
     ./hack/builddeps.sh
-    ./hack/make.py build admission-webhook
+    ./hack/make.py build apiserver
     detect_tag $DIST/.tag
     popd
 }
 
 build_docker() {
     pushd $REPO_ROOT/hack/docker
-    cp $DIST/admission-webhook/admission-webhook-alpine-amd64 admission-webhook
-    chmod 755 admission-webhook
+    cp $DIST/apiserver/apiserver-alpine-amd64 apiserver
+    chmod 755 apiserver
 
     cat >Dockerfile <<EOL
 FROM alpine
@@ -47,15 +47,15 @@ FROM alpine
 RUN set -x \
   && apk add --update --no-cache ca-certificates
 
-COPY admission-webhook /usr/bin/admission-webhook
+COPY apiserver /usr/bin/apiserver
 
 USER nobody:nobody
-ENTRYPOINT ["admission-webhook"]
+ENTRYPOINT ["apiserver"]
 EOL
     local cmd="docker build -t $DOCKER_REGISTRY/$IMG:$TAG ."
     echo $cmd; $cmd
 
-    rm admission-webhook Dockerfile
+    rm apiserver Dockerfile
     popd
 }
 

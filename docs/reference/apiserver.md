@@ -1,4 +1,4 @@
-## admission-webhook
+## apiserver
 
 
 
@@ -11,7 +11,7 @@
 ```
       --alsologtostderr                  log to standard error as well as files
       --analytics                        Send analytical events to Google Analytics (default true)
-  -h, --help                             help for admission-webhook
+  -h, --help                             help for apiserver
       --log_backtrace_at traceLocation   when logging hits line file:N, emit a stack trace (default :0)
       --log_dir string                   If non-empty, write log files in this directory
       --logtostderr                      log to standard error instead of files
@@ -22,6 +22,6 @@
 
 ### SEE ALSO
 
-* [admission-webhook run](admission-webhook_run.md)	 - Launch KubeDB admission webhook server
-* [admission-webhook version](admission-webhook_version.md)	 - Prints binary version number.
+* [apiserver run](apiserver_run.md)	 - Launch KubeDB admission webhook server
+* [apiserver version](apiserver_version.md)	 - Prints binary version number.
 

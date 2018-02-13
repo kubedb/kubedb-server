@@ -21,13 +21,13 @@ spec:
       containers:
       - name: webhook
         args:
-        - admission-webhook
+        - apiserver
         - --secure-port=8443
         - --audit-log-path=-
         - --tls-cert-file=/var/serving-cert/tls.crt
         - --tls-private-key-file=/var/serving-cert/tls.key
         - --v=3
-        image: kubedb/admission-webhook:canary
+        image: kubedb/apiserver:canary
         ports:
         - containerPort: 8443
         volumeMounts:
@@ -42,7 +42,7 @@ spec:
       - name: serving-cert
         secret:
           defaultMode: 420
-          secretName: kubedb-admission-webhook-cert
+          secretName: kubedb-apiserver-cert
       tolerations:
       - key: CriticalAddonsOnly
         operator: Exists
@@ -51,7 +51,7 @@ spec:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: kubedb-admission-webhook-cert
+  name: kubedb-apiserver-cert
   namespace: $KUBEDB_NAMESPACE
   labels:
     app: kubedb

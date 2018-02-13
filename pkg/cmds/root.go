@@ -9,8 +9,8 @@ import (
 	v "github.com/appscode/go/version"
 	"github.com/appscode/kutil/tools/analytics"
 	"github.com/jpillora/go-ogle-analytics"
-	"github.com/kubedb/admission-webhook/pkg/admission/plugin"
 	"github.com/kubedb/apimachinery/client/scheme"
+	"github.com/kubedb/apiserver/pkg/admission/plugin"
 	"github.com/openshift/generic-admission-server/pkg/cmd/server"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -29,7 +29,7 @@ var (
 
 func NewRootCmd(version string) *cobra.Command {
 	var rootCmd = &cobra.Command{
-		Use:               "admission-webhook",
+		Use:               "apiserver",
 		DisableAutoGenTag: true,
 		PersistentPreRun: func(c *cobra.Command, args []string) {
 			c.Flags().VisitAll(func(flag *pflag.Flag) {

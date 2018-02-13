@@ -4,7 +4,7 @@ import (
 	"log"
 
 	logs "github.com/appscode/go/log/golog"
-	"github.com/kubedb/admission-webhook/pkg/cmds"
+	"github.com/kubedb/apiserver/pkg/cmds"
 )
 
 func main() {

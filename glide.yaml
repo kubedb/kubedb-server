@@ -1,4 +1,4 @@
-package: github.com/kubedb/admission-webhook
+package: github.com/kubedb/apiserver
 import:
 - package: github.com/appscode/go
   version: master

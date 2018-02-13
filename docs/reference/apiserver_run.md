@@ -1,4 +1,4 @@
-## admission-webhook run
+## apiserver run
 
 Launch KubeDB admission webhook server
 
@@ -7,7 +7,7 @@ Launch KubeDB admission webhook server
 Launch KubeDB admission webhook server
 
 ```
-admission-webhook run [flags]
+apiserver run [flags]
 ```
 
 ### Options
@@ -68,5 +68,5 @@ admission-webhook run [flags]
 
 ### SEE ALSO
 
-* [admission-webhook](admission-webhook.md)	 - 
+* [apiserver](apiserver.md)	 - 
 

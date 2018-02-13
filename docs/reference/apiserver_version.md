@@ -1,4 +1,4 @@
-## admission-webhook version
+## apiserver version
 
 Prints binary version number.
 
@@ -7,7 +7,7 @@ Prints binary version number.
 Prints binary version number.
 
 ```
-admission-webhook version [flags]
+apiserver version [flags]
 ```
 
 ### Options
@@ -31,5 +31,5 @@ admission-webhook version [flags]
 
 ### SEE ALSO
 
-* [admission-webhook](admission-webhook.md)	 - 
+* [apiserver](apiserver.md)	 - 
 

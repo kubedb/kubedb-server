@@ -1,15 +1,15 @@
-[![Go Report Card](https://goreportcard.com/badge/github.com/kubedb/admission-webhook)](https://goreportcard.com/report/github.com/kubedb/admission-webhook)
+[![Go Report Card](https://goreportcard.com/badge/github.com/kubedb/apiserver)](https://goreportcard.com/report/github.com/kubedb/apiserver)
 
 [Website](https://kubedb.com) • [Slack](http://slack.kubernetes.io) • [Twitter](https://twitter.com/KubeDB)
 
-# admission-webhook
+# apiserver
 Admission webhook for KubeDB
 
 ## Installation
 To install KubeDB, please follow the guide [here](https://kubedb.com/docs/latest/setup/install/). To install the admission webhook, run the following command:
 
 ```console
-curl https://raw.githubusercontent.com/kubedb/admission-webhook/master/hack/deploy/webhook.sh | bash -s -- --rbac
+curl https://raw.githubusercontent.com/kubedb/apiserver/master/hack/deploy/webhook.sh | bash -s -- --rbac
 ```
 
 ## Using KubeDB
