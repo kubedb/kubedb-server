@@ -8,6 +8,20 @@ import:
   version: k-1.9
 - package: github.com/kubedb/apimachinery
   version: master
+- package: github.com/kubedb/apimachinery
+  version: master
+- package: github.com/kubedb/elasticsearch
+  version: master
+- package: github.com/kubedb/postgres
+  version: master
+- package: github.com/kubedb/mysql
+  version: master
+- package: github.com/kubedb/mongodb
+  version: master
+- package: github.com/kubedb/redis
+  version: master
+- package: github.com/kubedb/memcached
+  version: master
 - package: github.com/prometheus/common
   version: 3233b24a36715a2fe36d162260457857a56d672d
 - package: github.com/sirupsen/logrus

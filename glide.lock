@@ -1,5 +1,5 @@
-hash: 8dca68b948c0773eb4e018800ac90a32d26dd3ddf5e4c3b8cf9f769476ebc709
-updated: 2018-02-14T21:17:09.221011958-08:00
+hash: 1bdb95380cf27df6ca1b906e5def579733e200802e674c9e3674e90e779f3fa6
+updated: 2018-02-14T21:42:15.168543181-08:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
@@ -302,7 +302,7 @@ imports:
   - pkg/storage
   - pkg/validator
 - name: github.com/kubedb/elasticsearch
-  version: b440c174990c33798231df2124aea3810a262acf
+  version: 0cafc00c38db1bcfb54931c8fb5168befc3917f3
   subpackages:
   - pkg/docker
   - pkg/validator
@@ -312,9 +312,8 @@ imports:
   - pkg/docker
   - pkg/validator
 - name: github.com/kubedb/mongodb
-  version: de8f30be6c914ead85d25596836e7fb5313356f5
+  version: 6af9587243e8c8d50d24b8b1394781735e63c345
   subpackages:
-  - pkg/docker
   - pkg/validator
 - name: github.com/kubedb/mysql
   version: 6db2ae8d66b38c00106969bc801b247033e129dd
@@ -322,7 +321,7 @@ imports:
   - pkg/docker
   - pkg/validator
 - name: github.com/kubedb/postgres
-  version: d04e61ec820c48c076828471479d45ceee29ac9a
+  version: 20ecfa415967c961dd39d7dcd49918378d8b331c
   subpackages:
   - pkg/docker
   - pkg/validator
