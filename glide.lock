@@ -1,10 +1,10 @@
 hash: 8dca68b948c0773eb4e018800ac90a32d26dd3ddf5e4c3b8cf9f769476ebc709
-updated: 2018-02-13T11:19:43.453539588-08:00
+updated: 2018-02-14T21:17:09.221011958-08:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
 - name: cloud.google.com/go
-  version: fe3d41e1ecb2ce36ad3a979037c9b9a2b726226f
+  version: 3b1ae45394a234c385be014e9a488f2bb6eef821
   subpackages:
   - compute/metadata
   - internal
@@ -74,7 +74,7 @@ imports:
   subpackages:
   - storage
 - name: github.com/Azure/go-autorest
-  version: f6e08fe5e4d45c9a66e40196d3fed5f37331d224
+  version: e14a70c556c8e0db173358d1a903dca345a8e75e
   subpackages:
   - autorest
   - autorest/adal
@@ -293,7 +293,7 @@ imports:
 - name: github.com/juju/ratelimit
   version: 5b9ff866471762aa2ab2dced63c9fb6f53921342
 - name: github.com/kubedb/apimachinery
-  version: 1f787b4302ed6655f5295638cfaab5acfc1b6189
+  version: c3e38172bd159ef8b001283124150d338162fcdd
   subpackages:
   - apis/kubedb
   - apis/kubedb/v1alpha1
@@ -332,7 +332,7 @@ imports:
   - pkg/docker
   - pkg/validator
 - name: github.com/mailru/easyjson
-  version: 32fa128f234d041f196a9f3e0fea5ac9772c08e1
+  version: 2f5df55504ebc322e4d52d34df6a1f5b503bf26d
   subpackages:
   - buffer
   - jlexer
@@ -396,7 +396,7 @@ imports:
   subpackages:
   - doc
 - name: github.com/spf13/pflag
-  version: 4c012f6dcd9546820e378d0bdda4d8fc772cdfea
+  version: 6a877ebacf28c5fc79846f4fcd380a5d9872b997
 - name: github.com/ugorji/go
   version: ded73eae5db7e7a0ef6f55aace87a2873c5d2b74
   subpackages:
@@ -452,7 +452,7 @@ imports:
   - unicode/norm
   - width
 - name: google.golang.org/api
-  version: e771abbff930c1ae3c6e2c35117fc88856f11b2f
+  version: 3acc4f94acb5b02441cce6db56fc82a1016eadb4
   subpackages:
   - gensupport
   - googleapi
@@ -671,7 +671,6 @@ imports:
   - pkg/util/feature
   - pkg/util/flag
   - pkg/util/flushwriter
-  - pkg/util/logs
   - pkg/util/trace
   - pkg/util/webhook
   - pkg/util/wsstream
