@@ -9,7 +9,7 @@ import (
 	v "github.com/appscode/go/version"
 	"github.com/appscode/kutil/tools/analytics"
 	"github.com/jpillora/go-ogle-analytics"
-	"github.com/kubedb/apimachinery/client/scheme"
+	"github.com/kubedb/apimachinery/client/clientset/versioned/scheme"
 	"github.com/kubedb/apiserver/pkg/admission/plugin/elasticsearch"
 	"github.com/kubedb/apiserver/pkg/admission/plugin/memcached"
 	"github.com/kubedb/apiserver/pkg/admission/plugin/mongodb"
