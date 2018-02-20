@@ -99,5 +99,5 @@ func (a *RedisValidator) check(op admission.Operation, in runtime.Object) error 
 			return fmt.Errorf(`Redis %s can't be paused. To continue delete, unset spec.doNotPause and retry`, obj.Name)
 		}
 	}
-	return rdv.ValidateRedis(a.client, obj, nil)
+	return rdv.ValidateRedis(a.client, obj)
 }

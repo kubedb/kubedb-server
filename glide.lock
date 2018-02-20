@@ -1,5 +1,5 @@
 hash: 1bdb95380cf27df6ca1b906e5def579733e200802e674c9e3674e90e779f3fa6
-updated: 2018-02-17T11:54:02.156998919-08:00
+updated: 2018-02-20T16:41:10.835752339+06:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
@@ -16,11 +16,9 @@ imports:
   - encoding/json/types
   - encoding/yaml
   - homedir
-  - ioutil
   - log
   - log/golog
   - runtime
-  - sets
   - strings
   - types
   - version
@@ -29,7 +27,7 @@ imports:
   subpackages:
   - api
 - name: github.com/appscode/kutil
-  version: 579ddb8cc946c9e5f09d59863a3c5fe27cdc56f5
+  version: 20ffc2be6a1d88387bc6f6babe7bfe312c58b509
   subpackages:
   - meta
   - tools/analytics
@@ -159,7 +157,7 @@ imports:
   version: a1c26060308c9a7798d2900a9ec5f37d3e4eb42c
   repo: https://github.com/tamalsaha/prometheus-operator.git
 - name: github.com/cpuguy83/go-md2man
-  version: 71acacd42f85e5e82f70a55327789582a5200a90
+  version: 48d8747a2ca13185e7cc8efe6e9fc196a83f71a5
   subpackages:
   - md2man
 - name: github.com/davecgh/go-spew
@@ -168,18 +166,6 @@ imports:
   - spew
 - name: github.com/dgrijalva/jwt-go
   version: 01aeca54ebda6e0fbfafd0a524d234159c05ec20
-- name: github.com/docker/distribution
-  version: edc3ab29cdff8694dd6feb85cfeb4b5f1b38ed9c
-  subpackages:
-  - context
-  - digestset
-  - manifest
-  - manifest/schema1
-  - manifest/schema2
-  - reference
-  - uuid
-- name: github.com/docker/libtrust
-  version: aabc10ec26b754e797f9028f4589c5b7bd90dc20
 - name: github.com/elazarl/go-bindata-assetfs
   version: 3dcc96556217539f50599357fb481ac0dc7439b9
 - name: github.com/emicklei/go-restful
@@ -190,8 +176,6 @@ imports:
   version: dcef7f55730566d41eae5db10e7d6981829720f6
 - name: github.com/evanphx/json-patch
   version: 944e07253867aacae43c04b2e6a239005443f33a
-- name: github.com/fsnotify/fsnotify
-  version: c2828203cd70a50dcccfb2761f8b1f8ceef9a8e9
 - name: github.com/ghodss/yaml
   version: 0ca9ea5df5451ffdf184b4428c902747c2c11cd7
 - name: github.com/go-ini/ini
@@ -233,17 +217,13 @@ imports:
 - name: github.com/google/gofuzz
   version: 44d81051d367757e1c7c6a5a86423ece9afcf63c
 - name: github.com/google/uuid
-  version: dec09d789f3dba190787f8b4454c7d3c936fed9e
+  version: e367a344cbe8e08149f9951115dc299ebd42b919
 - name: github.com/googleapis/gnostic
   version: 0c5108395e2debce0d731cf0287ddf7242066aba
   subpackages:
   - OpenAPIv2
   - compiler
   - extensions
-- name: github.com/gorilla/context
-  version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
-- name: github.com/gorilla/mux
-  version: 0a192a193177452756c362c20087ddafcf6829c4
 - name: github.com/graymeta/stow
   version: 6f2b8867a3fb15cca5507da1d552b55cfe5d07a7
   repo: https://github.com/appscode/stow.git
@@ -274,10 +254,6 @@ imports:
   version: a0d98a5f288019575c6d1f4bb1573fef2d1fcdc4
   subpackages:
   - simplelru
-- name: github.com/heroku/docker-registry-client
-  version: fd2fe803496897db70c236ee244f41487ea92ec2
-  subpackages:
-  - registry
 - name: github.com/howeyc/gopass
   version: bf9dde6d0d2c004a008c27aaee91170c786f6db8
 - name: github.com/imdario/mergo
@@ -285,7 +261,7 @@ imports:
 - name: github.com/inconshreveable/mousetrap
   version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
 - name: github.com/jmespath/go-jmespath
-  version: 0b12d6b521d83fc7f755e7cfc1b1fbdd35a01a74
+  version: 3433f3ea46d9f8019119e7dd41274e112a2359a9
 - name: github.com/jpillora/go-ogle-analytics
   version: 14b04e0594ef6a9fd943363b135656f0ec8c9d0e
 - name: github.com/json-iterator/go
@@ -293,18 +269,16 @@ imports:
 - name: github.com/juju/ratelimit
   version: 5b9ff866471762aa2ab2dced63c9fb6f53921342
 - name: github.com/kubedb/apimachinery
-  version: 89214d2501bcf65be0ccfa067086d9dc5f0c511d
+  version: 282a9829f9556525f042f366ba2d17d21a1b4ffe
   subpackages:
   - apis/kubedb
   - apis/kubedb/v1alpha1
   - client/clientset/versioned/scheme
-  - pkg/docker
   - pkg/storage
   - pkg/validator
 - name: github.com/kubedb/elasticsearch
-  version: 4867374fc0b4a3a4134dc1e887108cc2727d529f
+  version: 9d799da7e7018b19bac63650c4a5e5ee67d9a255
   subpackages:
-  - pkg/docker
   - pkg/validator
 - name: github.com/kubedb/memcached
   version: 9eb51f1b2ef822927e62ae6aa4b0571f1530a95f
@@ -319,9 +293,8 @@ imports:
   subpackages:
   - pkg/validator
 - name: github.com/kubedb/postgres
-  version: 848f17aa1b71e96adc39c2a2199e43751933b0f7
+  version: bc18788caccb0fd1305c355c747596347e3dfeb1
   subpackages:
-  - pkg/docker
   - pkg/validator
 - name: github.com/kubedb/redis
   version: dc3173ab4af18258da47bda6e3a69235fe42c16a
@@ -345,8 +318,6 @@ imports:
   version: ae9f0ea1605b9aa6434ed5c731ca35d83ba67c55
 - name: github.com/NYTimes/gziphandler
   version: 56545f4a5d46df9a6648819d1664c3a03a13ffdb
-- name: github.com/opencontainers/go-digest
-  version: 279bed98673dd5bef374d3b6e4b09e2af76183bf
 - name: github.com/pborman/uuid
   version: ca53cad383cad2479bbba7f7a1a05797ec1386e4
 - name: github.com/peterbourgon/diskv
@@ -448,7 +419,7 @@ imports:
   - unicode/norm
   - width
 - name: google.golang.org/api
-  version: c7a403bb5fe12fe4644bb956edd5cd677626120a
+  version: c76a25da6c114df45a86acb8873ae83eda1430b9
   subpackages:
   - gensupport
   - googleapi
@@ -591,21 +562,8 @@ imports:
   version: 1270e9f1ad9eaf6127691df90af0836f7e152495
   subpackages:
   - pkg/admission
-  - pkg/admission/configuration
   - pkg/admission/initializer
-  - pkg/admission/metrics
-  - pkg/admission/plugin/initialization
   - pkg/admission/plugin/namespace/lifecycle
-  - pkg/admission/plugin/webhook/config
-  - pkg/admission/plugin/webhook/config/apis/webhookadmission
-  - pkg/admission/plugin/webhook/config/apis/webhookadmission/v1alpha1
-  - pkg/admission/plugin/webhook/errors
-  - pkg/admission/plugin/webhook/mutating
-  - pkg/admission/plugin/webhook/namespace
-  - pkg/admission/plugin/webhook/request
-  - pkg/admission/plugin/webhook/rules
-  - pkg/admission/plugin/webhook/validating
-  - pkg/admission/plugin/webhook/versioned
   - pkg/apis/apiserver
   - pkg/apis/apiserver/install
   - pkg/apis/apiserver/v1alpha1

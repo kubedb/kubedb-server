@@ -99,5 +99,5 @@ func (a *MongoDBValidator) check(op admission.Operation, in runtime.Object) erro
 			return fmt.Errorf(`MongoDB %s can't be paused. To continue delete, unset spec.doNotPause and retry`, obj.Name)
 		}
 	}
-	return mgv.ValidateMongoDB(a.client, obj, nil)
+	return mgv.ValidateMongoDB(a.client, obj)
 }

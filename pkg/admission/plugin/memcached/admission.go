@@ -99,5 +99,5 @@ func (a *MemcachedValidator) check(op admission.Operation, in runtime.Object) er
 			return fmt.Errorf(`Memcached %s can't be paused. To continue delete, unset spec.doNotPause and retry`, obj.Name)
 		}
 	}
-	return memv.ValidateMemcached(a.client, obj, nil)
+	return memv.ValidateMemcached(a.client, obj)
 }

@@ -99,5 +99,5 @@ func (a *MySQLValidator) check(op admission.Operation, in runtime.Object) error 
 			return fmt.Errorf(`MySQL %s can't be paused. To continue delete, unset spec.doNotPause and retry`, obj.Name)
 		}
 	}
-	return msv.ValidateMySQL(a.client, obj, nil)
+	return msv.ValidateMySQL(a.client, obj)
 }

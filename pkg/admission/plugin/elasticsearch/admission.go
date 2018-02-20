@@ -99,5 +99,5 @@ func (a *ElasticsearchValidator) check(op admission.Operation, in runtime.Object
 			return fmt.Errorf(`Elasticsearch %s can't be paused. To continue, unset spec.doNotPause and retry`, obj.Name)
 		}
 	}
-	return esv.ValidateElasticsearch(a.client, obj, nil)
+	return esv.ValidateElasticsearch(a.client, obj)
 }
