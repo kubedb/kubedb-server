@@ -77,7 +77,7 @@ while test $# -gt 0; do
             shift
             ;;
         --rbac)
-            export KUBEDB_SERVICE_ACCOUNT=kubedb-apiserver
+            export KUBEDB_SERVICE_ACCOUNT=kubedb-server
             export KUBEDB_ENABLE_RBAC=true
             shift
             ;;
@@ -116,7 +116,7 @@ echo ""
 # - a local CA key and cert
 # - a webhook server key and cert signed by the local CA
 $ONESSL create ca-cert
-$ONESSL create server-cert server --domains=kubedb-apiserver.$KUBEDB_NAMESPACE.svc
+$ONESSL create server-cert server --domains=kubedb-server.$KUBEDB_NAMESPACE.svc
 export SERVICE_SERVING_CERT_CA=$(cat ca.crt | $ONESSL base64)
 export TLS_SERVING_CERT=$(cat server.crt | $ONESSL base64)
 export TLS_SERVING_KEY=$(cat server.key | $ONESSL base64)

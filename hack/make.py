@@ -35,10 +35,10 @@ import subprocess
 import sys
 from os.path import expandvars, join, dirname
 
-libbuild.REPO_ROOT = expandvars('$GOPATH') + '/src/github.com/kubedb/apiserver'
+libbuild.REPO_ROOT = expandvars('$GOPATH') + '/src/github.com/kubedb/kubedb-server'
 BUILD_METADATA = libbuild.metadata(libbuild.REPO_ROOT)
 libbuild.BIN_MATRIX = {
-    'apiserver': {
+    'kubedb-server': {
         'type': 'go',
         'go_version': True,
         'use_cgo': False,

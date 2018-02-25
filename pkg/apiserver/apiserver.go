@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	hookapi "github.com/kubedb/apiserver/pkg/admission/api"
-	"github.com/kubedb/apiserver/pkg/registry/admissionreview"
+	hookapi "github.com/kubedb/kubedb-server/pkg/admission/api"
+	"github.com/kubedb/kubedb-server/pkg/registry/admissionreview"
 	admission "k8s.io/api/admission/v1beta1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/apimachinery"

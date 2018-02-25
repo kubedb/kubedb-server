@@ -2,7 +2,7 @@
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
 metadata:
-  name: kubedb-apiserver-extension-server-authentication-reader
+  name: kubedb-server-extension-server-authentication-reader
   namespace: kube-system
 roleRef:
   kind: Role
@@ -17,7 +17,7 @@ subjects:
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
-  name: kubedb-apiserver-auth-delegator
+  name: kubedb-server-auth-delegator
   labels:
     app: kubedb
 roleRef:
@@ -64,7 +64,7 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: kubedb-apiserver
+  name: kubedb-server
   labels:
     app: kubedb
 roleRef:

@@ -1,4 +1,4 @@
-[![Go Report Card](https://goreportcard.com/badge/github.com/kubedb/apiserver)](https://goreportcard.com/report/github.com/kubedb/apiserver)
+[![Go Report Card](https://goreportcard.com/badge/github.com/kubedb/kubedb-server)](https://goreportcard.com/report/github.com/kubedb/kubedb-server)
 
 [Website](https://kubedb.com) • [Slack](http://slack.kubernetes.io) • [Twitter](https://twitter.com/KubeDB)
 

@@ -5,8 +5,8 @@ import (
 	"io"
 	"net"
 
-	hookapi "github.com/kubedb/apiserver/pkg/admission/api"
-	"github.com/kubedb/apiserver/pkg/apiserver"
+	hookapi "github.com/kubedb/kubedb-server/pkg/admission/api"
+	"github.com/kubedb/kubedb-server/pkg/apiserver"
 	"github.com/spf13/cobra"
 	admissionv1beta1 "k8s.io/api/admission/v1beta1"
 	genericapiserver "k8s.io/apiserver/pkg/server"

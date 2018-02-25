@@ -7,7 +7,7 @@ import (
 
 	"github.com/appscode/kutil/meta"
 	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
-	hookapi "github.com/kubedb/apiserver/pkg/admission/api"
+	hookapi "github.com/kubedb/kubedb-server/pkg/admission/api"
 	pgv "github.com/kubedb/postgres/pkg/validator"
 	admission "k8s.io/api/admission/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

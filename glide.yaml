@@ -1,4 +1,4 @@
-package: github.com/kubedb/apiserver
+package: github.com/kubedb/kubedb-server
 import:
 - package: github.com/appscode/go
   version: master

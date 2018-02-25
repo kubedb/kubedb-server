@@ -6,7 +6,7 @@ import (
 	"runtime"
 
 	logs "github.com/appscode/go/log/golog"
-	"github.com/kubedb/apiserver/pkg/cmds"
+	"github.com/kubedb/kubedb-server/pkg/cmds"
 )
 
 func main() {
