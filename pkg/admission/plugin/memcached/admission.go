@@ -7,6 +7,7 @@ import (
 
 	"github.com/appscode/kutil/meta"
 	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
+	cs "github.com/kubedb/apimachinery/client/clientset/versioned/typed/kubedb/v1alpha1"
 	hookapi "github.com/kubedb/kubedb-server/pkg/admission/api"
 	memv "github.com/kubedb/memcached/pkg/validator"
 	admission "k8s.io/api/admission/v1beta1"
@@ -19,6 +20,7 @@ import (
 
 type MemcachedValidator struct {
 	client      kubernetes.Interface
+	extClient   cs.KubedbV1alpha1Interface
 	lock        sync.RWMutex
 	initialized bool
 }
@@ -40,9 +42,13 @@ func (a *MemcachedValidator) Initialize(config *rest.Config, stopCh <-chan struc
 
 	a.initialized = true
 
-	shallowCopy := *config
 	var err error
-	a.client, err = kubernetes.NewForConfig(&shallowCopy)
+	if a.client, err = kubernetes.NewForConfig(config); err != nil {
+		return err
+	}
+	if a.extClient, err = cs.NewForConfig(config); err != nil {
+		return err
+	}
 	return err
 }
 
@@ -94,10 +100,8 @@ func (a *MemcachedValidator) Admit(req *admission.AdmissionRequest) *admission.A
 
 func (a *MemcachedValidator) check(op admission.Operation, in runtime.Object) error {
 	obj := in.(*api.Memcached)
-	if op == admission.Delete {
-		if obj.Spec.DoNotPause {
-			return fmt.Errorf(`Memcached %s can't be paused. To continue delete, unset spec.doNotPause and retry`, obj.Name)
-		}
+	if op == admission.Delete && obj.Spec.DoNotPause {
+		return fmt.Errorf(`memcached "%s" can't be paused. To continue delete, unset spec.doNotPause and retry`, obj.Name)
 	}
-	return memv.ValidateMemcached(a.client, obj)
+	return memv.ValidateMemcached(a.client, a.extClient, obj)
 }

@@ -7,6 +7,7 @@ import (
 
 	"github.com/appscode/kutil/meta"
 	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
+	cs "github.com/kubedb/apimachinery/client/clientset/versioned/typed/kubedb/v1alpha1"
 	hookapi "github.com/kubedb/kubedb-server/pkg/admission/api"
 	rdv "github.com/kubedb/redis/pkg/validator"
 	admission "k8s.io/api/admission/v1beta1"
@@ -19,6 +20,7 @@ import (
 
 type RedisValidator struct {
 	client      kubernetes.Interface
+	extClient   cs.KubedbV1alpha1Interface
 	lock        sync.RWMutex
 	initialized bool
 }
@@ -40,9 +42,13 @@ func (a *RedisValidator) Initialize(config *rest.Config, stopCh <-chan struct{})
 
 	a.initialized = true
 
-	shallowCopy := *config
 	var err error
-	a.client, err = kubernetes.NewForConfig(&shallowCopy)
+	if a.client, err = kubernetes.NewForConfig(config); err != nil {
+		return err
+	}
+	if a.extClient, err = cs.NewForConfig(config); err != nil {
+		return err
+	}
 	return err
 }
 
@@ -94,10 +100,8 @@ func (a *RedisValidator) Admit(req *admission.AdmissionRequest) *admission.Admis
 
 func (a *RedisValidator) check(op admission.Operation, in runtime.Object) error {
 	obj := in.(*api.Redis)
-	if op == admission.Delete {
-		if obj.Spec.DoNotPause {
-			return fmt.Errorf(`Redis %s can't be paused. To continue delete, unset spec.doNotPause and retry`, obj.Name)
-		}
+	if op == admission.Delete && obj.Spec.DoNotPause {
+		return fmt.Errorf(`redis "%s" can't be paused. To continue delete, unset spec.doNotPause and retry`, obj.Name)
 	}
-	return rdv.ValidateRedis(a.client, obj)
+	return rdv.ValidateRedis(a.client, a.extClient, obj)
 }

@@ -7,6 +7,7 @@ import (
 
 	"github.com/appscode/kutil/meta"
 	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
+	cs "github.com/kubedb/apimachinery/client/clientset/versioned/typed/kubedb/v1alpha1"
 	hookapi "github.com/kubedb/kubedb-server/pkg/admission/api"
 	pgv "github.com/kubedb/postgres/pkg/validator"
 	admission "k8s.io/api/admission/v1beta1"
@@ -19,6 +20,7 @@ import (
 
 type PostgresValidator struct {
 	client      kubernetes.Interface
+	extClient   cs.KubedbV1alpha1Interface
 	lock        sync.RWMutex
 	initialized bool
 }
@@ -40,10 +42,14 @@ func (a *PostgresValidator) Initialize(config *rest.Config, stopCh <-chan struct
 
 	a.initialized = true
 
-	shallowCopy := *config
 	var err error
-	a.client, err = kubernetes.NewForConfig(&shallowCopy)
-	return err
+	if a.client, err = kubernetes.NewForConfig(config); err != nil {
+		return err
+	}
+	if a.extClient, err = cs.NewForConfig(config); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *PostgresValidator) Admit(req *admission.AdmissionRequest) *admission.AdmissionResponse {
@@ -94,10 +100,8 @@ func (a *PostgresValidator) Admit(req *admission.AdmissionRequest) *admission.Ad
 
 func (a *PostgresValidator) check(op admission.Operation, in runtime.Object) error {
 	obj := in.(*api.Postgres)
-	if op == admission.Delete {
-		if obj.Spec.DoNotPause {
-			return fmt.Errorf(`Postgres %s can't be paused. To continue delete, unset spec.doNotPause and retry`, obj.Name)
-		}
+	if op == admission.Delete && obj.Spec.DoNotPause {
+		return fmt.Errorf(`postgres "%s" can't be paused. To continue delete, unset spec.doNotPause and retry`, obj.Name)
 	}
-	return pgv.ValidatePostgres(a.client, obj)
+	return pgv.ValidatePostgres(a.client, a.extClient, obj)
 }

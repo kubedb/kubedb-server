@@ -39,9 +39,8 @@ func (a *SnapshotValidator) Initialize(config *rest.Config, stopCh <-chan struct
 
 	a.initialized = true
 
-	shallowCopy := *config
 	var err error
-	a.client, err = kubernetes.NewForConfig(&shallowCopy)
+	a.client, err = kubernetes.NewForConfig(config)
 	return err
 }
 
