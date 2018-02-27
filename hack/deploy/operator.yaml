@@ -2,7 +2,7 @@ apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: kubedb-server
-  namespace: $KUBEDB_NAMESPACE
+  namespace: ${KUBEDB_NAMESPACE}
   labels:
     app: kubedb
 spec:
@@ -17,7 +17,7 @@ spec:
       annotations:
         scheduler.alpha.kubernetes.io/critical-pod: ''
     spec:
-      serviceAccountName: $KUBEDB_SERVICE_ACCOUNT
+      serviceAccountName: ${KUBEDB_SERVICE_ACCOUNT}
       containers:
       - name: server
         args:
@@ -52,20 +52,20 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: kubedb-server-cert
-  namespace: $KUBEDB_NAMESPACE
+  namespace: ${KUBEDB_NAMESPACE}
   labels:
     app: kubedb
 type: kubernetes.io/tls
 data:
-  tls.crt: $TLS_SERVING_CERT
-  tls.key: $TLS_SERVING_KEY
+  tls.crt: ${TLS_SERVING_CERT}
+  tls.key: ${TLS_SERVING_KEY}
 ---
 # to be able to expose TSB inside the cluster
 apiVersion: v1
 kind: Service
 metadata:
   name: kubedb-server
-  namespace: $KUBEDB_NAMESPACE
+  namespace: ${KUBEDB_NAMESPACE}
   labels:
     app: kubedb
 spec:
@@ -84,16 +84,22 @@ metadata:
   labels:
     app: kubedb
 spec:
-  caBundle: $SERVICE_SERVING_CERT_CA
+  caBundle: ${SERVICE_SERVING_CERT_CA}
   group: admission.kubedb.com
   groupPriorityMinimum: 1000
   versionPriority: 15
   service:
     name: kubedb-server
-    namespace: $KUBEDB_NAMESPACE
+    namespace: ${KUBEDB_NAMESPACE}
   version: v1alpha1
 ---
 # register to intercept kubedb CRD creates / updates
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: admission.kubedb.com
+  labels:
+    app: kubedb
 webhooks:
 - name: elasticsearch.admission.kubedb.com
   clientConfig:

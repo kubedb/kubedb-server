@@ -1,7 +1,6 @@
 package mongodb
 
 import (
-	"fmt"
 	"net/http"
 	"sync"
 
@@ -10,6 +9,7 @@ import (
 	cs "github.com/kubedb/apimachinery/client/clientset/versioned/typed/kubedb/v1alpha1"
 	hookapi "github.com/kubedb/kubedb-server/pkg/admission/api"
 	mgv "github.com/kubedb/mongodb/pkg/validator"
+	"github.com/pkg/errors"
 	admission "k8s.io/api/admission/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -101,7 +101,7 @@ func (a *MongoDBValidator) Admit(req *admission.AdmissionRequest) *admission.Adm
 func (a *MongoDBValidator) check(op admission.Operation, in runtime.Object) error {
 	obj := in.(*api.MongoDB)
 	if op == admission.Delete && obj.Spec.DoNotPause {
-		return fmt.Errorf(`mongodb "%s" can't be paused. To continue delete, unset spec.doNotPause and retry`, obj.Name)
+		return errors.Errorf(`mongodb "%s" can't be paused. To continue delete, unset spec.doNotPause and retry`, obj.Name)
 	}
 	return mgv.ValidateMongoDB(a.client, a.extClient, obj)
 }

@@ -1,7 +1,6 @@
 package mysql
 
 import (
-	"fmt"
 	"net/http"
 	"sync"
 
@@ -10,6 +9,7 @@ import (
 	cs "github.com/kubedb/apimachinery/client/clientset/versioned/typed/kubedb/v1alpha1"
 	hookapi "github.com/kubedb/kubedb-server/pkg/admission/api"
 	msv "github.com/kubedb/mysql/pkg/validator"
+	"github.com/pkg/errors"
 	admission "k8s.io/api/admission/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -101,7 +101,7 @@ func (a *MySQLValidator) Admit(req *admission.AdmissionRequest) *admission.Admis
 func (a *MySQLValidator) check(op admission.Operation, in runtime.Object) error {
 	obj := in.(*api.MySQL)
 	if op == admission.Delete && obj.Spec.DoNotPause {
-		return fmt.Errorf(`mysql "%s" can't be paused. To continue delete, unset spec.doNotPause and retry`, obj.Name)
+		return errors.Errorf(`mysql "%s" can't be paused. To continue delete, unset spec.doNotPause and retry`, obj.Name)
 	}
 	return msv.ValidateMySQL(a.client, a.extClient, obj)
 }

@@ -123,10 +123,12 @@ export TLS_SERVING_KEY=$(cat server.key | $ONESSL base64)
 export KUBE_CA=$($ONESSL get kube-ca | $ONESSL base64)
 rm -rf $ONESSL ca.crt ca.key server.crt server.key
 
-curl -fsSL https://raw.githubusercontent.com/kubedb/apiserver/master/hack/deploy/operator.yaml | envsubst | kubectl apply -f -
+curl -fsSL https://raw.githubusercontent.com/kubedb/apiserver/master/hack/deploy/operator.yaml | $ONESSL envsubst | kubectl apply -f -
 
 if [ "$KUBEDB_ENABLE_RBAC" = true ]; then
     kubectl create serviceaccount $KUBEDB_SERVICE_ACCOUNT --namespace $KUBEDB_NAMESPACE
     kubectl label serviceaccount $KUBEDB_SERVICE_ACCOUNT app=kubedb --namespace $KUBEDB_NAMESPACE
-    curl -fsSL https://raw.githubusercontent.com/kubedb/apiserver/master/hack/deploy/rbac-list.yaml | envsubst | kubectl auth reconcile -f -
+    curl -fsSL https://raw.githubusercontent.com/kubedb/apiserver/master/hack/deploy/rbac-list.yaml | $ONESSL envsubst | kubectl auth reconcile -f -
 fi
+
+curl -fsSL https://raw.githubusercontent.com/kubedb/apiserver/master/hack/deploy/admission.yaml | $ONESSL envsubst | kubectl apply -f -

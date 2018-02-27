@@ -1,12 +1,12 @@
 package server
 
 import (
-	"fmt"
 	"io"
 	"net"
 
 	hookapi "github.com/kubedb/kubedb-server/pkg/admission/api"
 	"github.com/kubedb/kubedb-server/pkg/apiserver"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	admissionv1beta1 "k8s.io/api/admission/v1beta1"
 	genericapiserver "k8s.io/apiserver/pkg/server"
@@ -77,7 +77,7 @@ func (o *AdmissionServerOptions) Complete() error {
 func (o AdmissionServerOptions) Config() (*apiserver.Config, error) {
 	// TODO have a "real" external address
 	if err := o.RecommendedOptions.SecureServing.MaybeDefaultWithSelfSignedCerts("localhost", nil, []net.IP{net.ParseIP("127.0.0.1")}); err != nil {
-		return nil, fmt.Errorf("error creating self-signed certificates: %v", err)
+		return nil, errors.Errorf("error creating self-signed certificates: %v", err)
 	}
 
 	serverConfig := genericapiserver.NewRecommendedConfig(apiserver.Codecs)
@@ -89,6 +89,7 @@ func (o AdmissionServerOptions) Config() (*apiserver.Config, error) {
 		GenericConfig: serverConfig,
 		ExtraConfig: apiserver.ExtraConfig{
 			AdmissionHooks: o.AdmissionHooks,
+			ClientConfig:   serverConfig.ClientConfig,
 		},
 	}
 	return config, nil

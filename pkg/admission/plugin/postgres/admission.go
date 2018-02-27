@@ -1,7 +1,6 @@
 package postgres
 
 import (
-	"fmt"
 	"net/http"
 	"sync"
 
@@ -10,6 +9,7 @@ import (
 	cs "github.com/kubedb/apimachinery/client/clientset/versioned/typed/kubedb/v1alpha1"
 	hookapi "github.com/kubedb/kubedb-server/pkg/admission/api"
 	pgv "github.com/kubedb/postgres/pkg/validator"
+	"github.com/pkg/errors"
 	admission "k8s.io/api/admission/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -101,7 +101,7 @@ func (a *PostgresValidator) Admit(req *admission.AdmissionRequest) *admission.Ad
 func (a *PostgresValidator) check(op admission.Operation, in runtime.Object) error {
 	obj := in.(*api.Postgres)
 	if op == admission.Delete && obj.Spec.DoNotPause {
-		return fmt.Errorf(`postgres "%s" can't be paused. To continue delete, unset spec.doNotPause and retry`, obj.Name)
+		return errors.Errorf(`postgres "%s" can't be paused. To continue delete, unset spec.doNotPause and retry`, obj.Name)
 	}
 	return pgv.ValidatePostgres(a.client, a.extClient, obj)
 }

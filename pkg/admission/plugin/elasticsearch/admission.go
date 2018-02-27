@@ -1,7 +1,6 @@
 package elasticsearch
 
 import (
-	"fmt"
 	"net/http"
 	"sync"
 
@@ -10,6 +9,7 @@ import (
 	cs "github.com/kubedb/apimachinery/client/clientset/versioned/typed/kubedb/v1alpha1"
 	esv "github.com/kubedb/elasticsearch/pkg/validator"
 	hookapi "github.com/kubedb/kubedb-server/pkg/admission/api"
+	"github.com/pkg/errors"
 	admission "k8s.io/api/admission/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -101,7 +101,7 @@ func (a *ElasticsearchValidator) Admit(req *admission.AdmissionRequest) *admissi
 func (a *ElasticsearchValidator) check(op admission.Operation, in runtime.Object) error {
 	obj := in.(*api.Elasticsearch)
 	if op == admission.Delete && obj.Spec.DoNotPause {
-		return fmt.Errorf(`elasticsearch "%s" can't be paused. To continue, unset spec.doNotPause and retry`, obj.Name)
+		return errors.Errorf(`elasticsearch "%s" can't be paused. To continue, unset spec.doNotPause and retry`, obj.Name)
 	}
 	return esv.ValidateElasticsearch(a.client, a.extClient, obj)
 }

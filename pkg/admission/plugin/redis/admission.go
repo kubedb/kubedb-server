@@ -1,7 +1,6 @@
 package redis
 
 import (
-	"fmt"
 	"net/http"
 	"sync"
 
@@ -10,6 +9,7 @@ import (
 	cs "github.com/kubedb/apimachinery/client/clientset/versioned/typed/kubedb/v1alpha1"
 	hookapi "github.com/kubedb/kubedb-server/pkg/admission/api"
 	rdv "github.com/kubedb/redis/pkg/validator"
+	"github.com/pkg/errors"
 	admission "k8s.io/api/admission/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -101,7 +101,7 @@ func (a *RedisValidator) Admit(req *admission.AdmissionRequest) *admission.Admis
 func (a *RedisValidator) check(op admission.Operation, in runtime.Object) error {
 	obj := in.(*api.Redis)
 	if op == admission.Delete && obj.Spec.DoNotPause {
-		return fmt.Errorf(`redis "%s" can't be paused. To continue delete, unset spec.doNotPause and retry`, obj.Name)
+		return errors.Errorf(`redis "%s" can't be paused. To continue delete, unset spec.doNotPause and retry`, obj.Name)
 	}
 	return rdv.ValidateRedis(a.client, a.extClient, obj)
 }
