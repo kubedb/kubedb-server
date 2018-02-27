@@ -1,5 +1,5 @@
-hash: 2d7c8375cfb1e4c8e455180ada9d30abc26680094c54018b3b898a75592ac439
-updated: 2018-02-27T03:26:13.775265426-08:00
+hash: ea3f247f3c5bba14f10909999af4dfe848361540bdba7083f9125871b58458fb
+updated: 2018-02-27T04:38:52.565856659-08:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
@@ -278,27 +278,27 @@ imports:
   - pkg/storage
   - pkg/validator
 - name: github.com/kubedb/elasticsearch
-  version: 8e34461920f8ef8117dabfcdd05250403f25f6a8
+  version: 1e48793e3f8d1eab09e0c97f82e8f8915e270b66
   subpackages:
   - pkg/validator
 - name: github.com/kubedb/memcached
-  version: 2bab26a440f2ce68a3896b5fb583439bbe99ad40
+  version: 621878fe25b355bcd47428528e99170ed760b0b9
   subpackages:
   - pkg/validator
 - name: github.com/kubedb/mongodb
-  version: c14279b8947406bce9ce3501ffb243156a3c685f
+  version: 558e60d7073eddb2ce9db7dfc6ce671bc25ae63b
   subpackages:
   - pkg/validator
 - name: github.com/kubedb/mysql
-  version: 4d46d95d2a517408b3a0dffc9ae91be283623d94
+  version: b4b749dff97bd2ed8a91ae418be86e1bb1f03bbd
   subpackages:
   - pkg/validator
 - name: github.com/kubedb/postgres
-  version: 8f7dc0db67d4e0206d1763741eb7fd03a41d6f64
+  version: bcd8dc144ed7f0d306ce3e31248a604d803286f9
   subpackages:
   - pkg/validator
 - name: github.com/kubedb/redis
-  version: 5000d64623e13444f291be71b6b02194c4de4f41
+  version: 587883208079c25b2eb61ea091d30317d9ae54d3
   subpackages:
   - pkg/validator
 - name: github.com/mailru/easyjson
@@ -463,7 +463,7 @@ imports:
 - name: gopkg.in/natefinch/lumberjack.v2
   version: 20b71e5b60d756d3d2f80def009790325acc2b23
 - name: gopkg.in/yaml.v2
-  version: 7f97868eec74b32b0982dd158a51a446d1da7eb5
+  version: 53feefa2559fb8dfa8d81baad31be332c97d6c77
 - name: k8s.io/api
   version: af4bc157c3a209798fc897f6d4aaaaeb6c2e0d6a
   subpackages:
