@@ -10,7 +10,6 @@ import (
 	hookapi "github.com/kubedb/kubedb-server/pkg/admission/api"
 	admission "k8s.io/api/admission/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -76,7 +75,7 @@ func (a *SnapshotValidator) Admit(req *admission.AdmissionRequest) *admission.Ad
 		return status
 	}
 
-	err = a.check(req.Operation, obj)
+	err = amv.ValidateSnapshotSpec(a.client, obj.(*api.Snapshot).Spec.SnapshotStorageSpec, req.Namespace)
 	if err != nil {
 		status.Allowed = false
 		status.Result = &metav1.Status{
@@ -88,12 +87,4 @@ func (a *SnapshotValidator) Admit(req *admission.AdmissionRequest) *admission.Ad
 
 	status.Allowed = true
 	return status
-}
-
-func (a *SnapshotValidator) check(op admission.Operation, in runtime.Object) error {
-	if op == admission.Delete {
-		return nil
-	}
-	obj := in.(*api.Snapshot)
-	return amv.ValidateSnapshotSpec(a.client, obj.Spec.SnapshotStorageSpec, obj.Namespace)
 }

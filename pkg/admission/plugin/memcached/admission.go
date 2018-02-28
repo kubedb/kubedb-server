@@ -1,6 +1,7 @@
 package memcached
 
 import (
+	"fmt"
 	"net/http"
 	"sync"
 
@@ -9,10 +10,8 @@ import (
 	cs "github.com/kubedb/apimachinery/client/clientset/versioned/typed/kubedb/v1alpha1"
 	hookapi "github.com/kubedb/kubedb-server/pkg/admission/api"
 	memv "github.com/kubedb/memcached/pkg/validator"
-	"github.com/pkg/errors"
 	admission "k8s.io/api/admission/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -74,6 +73,21 @@ func (a *MemcachedValidator) Admit(req *admission.AdmissionRequest) *admission.A
 		return status
 	}
 
+	if req.Operation == admission.Delete {
+		// req.Object.Raw = nil, so read from kubernetes
+		obj, err := a.extClient.Memcacheds(req.Namespace).Get(req.Name, metav1.GetOptions{})
+		if err == nil && obj.Spec.DoNotPause {
+			status.Allowed = false
+			status.Result = &metav1.Status{
+				Status: metav1.StatusFailure, Code: http.StatusBadRequest, Reason: metav1.StatusReasonBadRequest,
+				Message: fmt.Sprintf(`memcached "%s" can't be paused. To continue delete, unset spec.doNotPause and retry`, req.Name),
+			}
+			return status
+		}
+		status.Allowed = true
+		return status
+	}
+
 	obj, err := meta.UnmarshalToJSON(req.Object.Raw, api.SchemeGroupVersion)
 	if err != nil {
 		status.Allowed = false
@@ -84,7 +98,7 @@ func (a *MemcachedValidator) Admit(req *admission.AdmissionRequest) *admission.A
 		return status
 	}
 
-	err = a.check(req.Operation, obj)
+	err = memv.ValidateMemcached(a.client, a.extClient, obj.(*api.Memcached))
 	if err != nil {
 		status.Allowed = false
 		status.Result = &metav1.Status{
@@ -96,12 +110,4 @@ func (a *MemcachedValidator) Admit(req *admission.AdmissionRequest) *admission.A
 
 	status.Allowed = true
 	return status
-}
-
-func (a *MemcachedValidator) check(op admission.Operation, in runtime.Object) error {
-	obj := in.(*api.Memcached)
-	if op == admission.Delete && obj.Spec.DoNotPause {
-		return errors.Errorf(`memcached "%s" can't be paused. To continue delete, unset spec.doNotPause and retry`, obj.Name)
-	}
-	return memv.ValidateMemcached(a.client, a.extClient, obj)
 }
