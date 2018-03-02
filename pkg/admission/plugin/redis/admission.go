@@ -3,7 +3,7 @@ package redis
 import (
 	"fmt"
 	"sync"
-
+	kerr "k8s.io/apimachinery/pkg/api/errors"
 	hookapi "github.com/appscode/kutil/admission/api"
 	"github.com/appscode/kutil/meta"
 	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
@@ -70,7 +70,9 @@ func (a *RedisValidator) Admit(req *admission.AdmissionRequest) *admission.Admis
 	if req.Operation == admission.Delete {
 		// req.Object.Raw = nil, so read from kubernetes
 		obj, err := a.extClient.Redises(req.Namespace).Get(req.Name, metav1.GetOptions{})
-		if err == nil && obj.Spec.DoNotPause {
+		if err != nil && !kerr.IsNotFound(err) {
+			return hookapi.StatusInternalServerError(err)
+		} else if err == nil && obj.Spec.DoNotPause {
 			return hookapi.StatusBadRequest(fmt.Errorf(`redis "%s" can't be paused. To continue delete, unset spec.doNotPause and retry`, req.Name))
 		}
 		status.Allowed = true
