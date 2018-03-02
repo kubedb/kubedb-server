@@ -1,15 +1,13 @@
 package snapshot
 
 import (
-	"net/http"
 	"sync"
 
+	hookapi "github.com/appscode/kutil/admission/api"
 	"github.com/appscode/kutil/meta"
 	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	amv "github.com/kubedb/apimachinery/pkg/validator"
-	hookapi "github.com/kubedb/kubedb-server/pkg/admission/api"
 	admission "k8s.io/api/admission/v1beta1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -57,32 +55,17 @@ func (a *SnapshotValidator) Admit(req *admission.AdmissionRequest) *admission.Ad
 	a.lock.RLock()
 	defer a.lock.RUnlock()
 	if !a.initialized {
-		status.Allowed = false
-		status.Result = &metav1.Status{
-			Status: metav1.StatusFailure, Code: http.StatusInternalServerError, Reason: metav1.StatusReasonInternalError,
-			Message: "not initialized",
-		}
-		return status
+		return hookapi.StatusUninitialized()
 	}
 
 	obj, err := meta.UnmarshalToJSON(req.Object.Raw, api.SchemeGroupVersion)
 	if err != nil {
-		status.Allowed = false
-		status.Result = &metav1.Status{
-			Status: metav1.StatusFailure, Code: http.StatusBadRequest, Reason: metav1.StatusReasonBadRequest,
-			Message: err.Error(),
-		}
-		return status
+		return hookapi.StatusBadRequest(err)
 	}
 
 	err = amv.ValidateSnapshotSpec(a.client, obj.(*api.Snapshot).Spec.SnapshotStorageSpec, req.Namespace)
 	if err != nil {
-		status.Allowed = false
-		status.Result = &metav1.Status{
-			Status: metav1.StatusFailure, Code: http.StatusForbidden, Reason: metav1.StatusReasonForbidden,
-			Message: err.Error(),
-		}
-		return status
+		return hookapi.StatusForbidden(err)
 	}
 
 	status.Allowed = true
