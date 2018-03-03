@@ -1,5 +1,5 @@
 hash: ea3f247f3c5bba14f10909999af4dfe848361540bdba7083f9125871b58458fb
-updated: 2018-03-02T00:15:23.650090352-08:00
+updated: 2018-03-03T01:04:22.594787819-08:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
@@ -22,15 +22,18 @@ imports:
   - strings
   - types
   - version
+- name: github.com/appscode/jsonpatch
+  version: d554673fce2c0bef30d385e7946996a27f6be827
 - name: github.com/appscode/kube-mon
   version: 69036cc40b44a7ba97be91d530f421e3adaba407
   subpackages:
   - api
 - name: github.com/appscode/kutil
-  version: b50a429280d225160f1be6017ce967c93769dac1
+  version: 00a04e324e089e575b007bfa9927c2c3724d6286
   subpackages:
   - admission/api
   - meta
+  - registry/admissionreview/v1beta1
   - tools/analytics
 - name: github.com/appscode/osm
   version: 8175dd853f6f3d4530b14018901c79140e305f3a
@@ -421,7 +424,7 @@ imports:
   - unicode/norm
   - width
 - name: google.golang.org/api
-  version: ab90adb3efa287b869ecb698db42f923cc734972
+  version: 3caa384156365e545aea85c3dca8c95bc666a94d
   subpackages:
   - gensupport
   - googleapi

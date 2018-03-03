@@ -3,13 +3,14 @@ package redis
 import (
 	"fmt"
 	"sync"
-	kerr "k8s.io/apimachinery/pkg/api/errors"
+
 	hookapi "github.com/appscode/kutil/admission/api"
 	"github.com/appscode/kutil/meta"
 	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	cs "github.com/kubedb/apimachinery/client/clientset/versioned/typed/kubedb/v1alpha1"
 	rdv "github.com/kubedb/redis/pkg/validator"
 	admission "k8s.io/api/admission/v1beta1"
+	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/kubernetes"
