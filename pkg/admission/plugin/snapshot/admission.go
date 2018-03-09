@@ -1,12 +1,14 @@
 package snapshot
 
 import (
+	"fmt"
 	"sync"
 
 	hookapi "github.com/appscode/kutil/admission/api"
 	"github.com/appscode/kutil/meta"
 	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	amv "github.com/kubedb/apimachinery/pkg/validator"
+	"github.com/kubedb/kubedb-server/pkg/admission/util"
 	admission "k8s.io/api/admission/v1beta1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/kubernetes"
@@ -62,9 +64,16 @@ func (a *SnapshotValidator) Admit(req *admission.AdmissionRequest) *admission.Ad
 	if err != nil {
 		return hookapi.StatusBadRequest(err)
 	}
-
-	err = amv.ValidateSnapshotSpec(a.client, obj.(*api.Snapshot).Spec.SnapshotStorageSpec, req.Namespace)
-	if err != nil {
+	if req.Operation == admission.Update && !util.IsKubeDBOperator(req.UserInfo) {
+		oldObject, err := meta.UnmarshalToJSON(req.OldObject.Raw, api.SchemeGroupVersion)
+		if err != nil {
+			return hookapi.StatusBadRequest(err)
+		}
+		if err := util.ValidateUpdate(obj, oldObject, req.Kind.Kind); err != nil {
+			return hookapi.StatusBadRequest(fmt.Errorf("%v", err))
+		}
+	}
+	if err := amv.ValidateSnapshotSpec(a.client, obj.(*api.Snapshot).Spec.SnapshotStorageSpec, req.Namespace); err != nil {
 		return hookapi.StatusForbidden(err)
 	}
 

@@ -1,5 +1,5 @@
-hash: ea3f247f3c5bba14f10909999af4dfe848361540bdba7083f9125871b58458fb
-updated: 2018-03-03T01:04:22.594787819-08:00
+hash: ec2ce305c73a19c2142ff464c308b7aa1a1dfe22e11ab662f0a6cda6962d27df
+updated: 2018-03-08T10:08:12.985668949+06:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
@@ -23,13 +23,13 @@ imports:
   - types
   - version
 - name: github.com/appscode/jsonpatch
-  version: d554673fce2c0bef30d385e7946996a27f6be827
+  version: 3e75a56b8967932466984d4432401e1c1a7ff61e
 - name: github.com/appscode/kube-mon
-  version: 69036cc40b44a7ba97be91d530f421e3adaba407
+  version: a670a5ff28df12938aa324b9f13683caeb216f8f
   subpackages:
   - api
 - name: github.com/appscode/kutil
-  version: 00a04e324e089e575b007bfa9927c2c3724d6286
+  version: 01f44212cb743f96b271564c9bf53a8a32766c33
   subpackages:
   - admission/api
   - meta
@@ -161,7 +161,7 @@ imports:
   version: a1c26060308c9a7798d2900a9ec5f37d3e4eb42c
   repo: https://github.com/tamalsaha/prometheus-operator.git
 - name: github.com/cpuguy83/go-md2man
-  version: 71acacd42f85e5e82f70a55327789582a5200a90
+  version: 48d8747a2ca13185e7cc8efe6e9fc196a83f71a5
   subpackages:
   - md2man
 - name: github.com/davecgh/go-spew
@@ -170,6 +170,11 @@ imports:
   - spew
 - name: github.com/dgrijalva/jwt-go
   version: 01aeca54ebda6e0fbfafd0a524d234159c05ec20
+- name: github.com/docker/distribution
+  version: edc3ab29cdff8694dd6feb85cfeb4b5f1b38ed9c
+  subpackages:
+  - digestset
+  - reference
 - name: github.com/elazarl/go-bindata-assetfs
   version: 3dcc96556217539f50599357fb481ac0dc7439b9
 - name: github.com/emicklei/go-restful
@@ -198,7 +203,7 @@ imports:
   - proto
   - sortkeys
 - name: github.com/golang/glog
-  version: 44145f04b68cf362d9c4df2182967c2275eaefed
+  version: 23def4e6c14b4da8ac2ed8007337bc5eb5007998
 - name: github.com/golang/protobuf
   version: 1643683e1b54a9e88ad26d98f81400c8c9d9f4f9
   subpackages:
@@ -221,7 +226,7 @@ imports:
 - name: github.com/google/gofuzz
   version: 44d81051d367757e1c7c6a5a86423ece9afcf63c
 - name: github.com/google/uuid
-  version: dec09d789f3dba190787f8b4454c7d3c936fed9e
+  version: e367a344cbe8e08149f9951115dc299ebd42b919
 - name: github.com/googleapis/gnostic
   version: 0c5108395e2debce0d731cf0287ddf7242066aba
   subpackages:
@@ -277,8 +282,11 @@ imports:
   subpackages:
   - apis/kubedb
   - apis/kubedb/v1alpha1
+  - client/clientset/versioned
+  - client/clientset/versioned/fake
   - client/clientset/versioned/scheme
   - client/clientset/versioned/typed/kubedb/v1alpha1
+  - client/clientset/versioned/typed/kubedb/v1alpha1/fake
   - pkg/storage
   - pkg/validator
 - name: github.com/kubedb/elasticsearch
@@ -306,7 +314,7 @@ imports:
   subpackages:
   - pkg/validator
 - name: github.com/mailru/easyjson
-  version: 32fa128f234d041f196a9f3e0fea5ac9772c08e1
+  version: 2f5df55504ebc322e4d52d34df6a1f5b503bf26d
   subpackages:
   - buffer
   - jlexer
@@ -323,12 +331,14 @@ imports:
   version: ae9f0ea1605b9aa6434ed5c731ca35d83ba67c55
 - name: github.com/NYTimes/gziphandler
   version: 56545f4a5d46df9a6648819d1664c3a03a13ffdb
+- name: github.com/opencontainers/go-digest
+  version: a6d0ee40d4207ea02364bd3b9e8e77b9159ba1eb
 - name: github.com/pborman/uuid
   version: ca53cad383cad2479bbba7f7a1a05797ec1386e4
 - name: github.com/peterbourgon/diskv
   version: 5f041e8faa004a95c88a202771f4cc3e991971e6
 - name: github.com/pkg/errors
-  version: 30136e27e2ac8d167177e8a583aa4c3fea5be833
+  version: 645ef00459ed84a119197bfb8d8205042c6df63d
 - name: github.com/prometheus/client_golang
   version: c5b7fccd204277076155f10851dad72b76a49317
   subpackages:
@@ -424,7 +434,7 @@ imports:
   - unicode/norm
   - width
 - name: google.golang.org/api
-  version: 3caa384156365e545aea85c3dca8c95bc666a94d
+  version: 7f657476956314fee258816aaf81c0ff65cf8bee
   subpackages:
   - gensupport
   - googleapi
@@ -505,6 +515,7 @@ imports:
   subpackages:
   - pkg/apis/apiextensions
   - pkg/apis/apiextensions/v1beta1
+  - pkg/features
 - name: k8s.io/apimachinery
   version: 180eddb345a5be3a157cea1c624700ad5bd27b8f
   subpackages:
@@ -653,6 +664,7 @@ imports:
   version: 78700dec6369ba22221b72770783300f143df150
   subpackages:
   - discovery
+  - discovery/fake
   - informers
   - informers/admissionregistration
   - informers/admissionregistration/v1alpha1
@@ -694,35 +706,64 @@ imports:
   - informers/storage/v1alpha1
   - informers/storage/v1beta1
   - kubernetes
+  - kubernetes/fake
   - kubernetes/scheme
   - kubernetes/typed/admissionregistration/v1alpha1
+  - kubernetes/typed/admissionregistration/v1alpha1/fake
   - kubernetes/typed/admissionregistration/v1beta1
+  - kubernetes/typed/admissionregistration/v1beta1/fake
   - kubernetes/typed/apps/v1
+  - kubernetes/typed/apps/v1/fake
   - kubernetes/typed/apps/v1beta1
+  - kubernetes/typed/apps/v1beta1/fake
   - kubernetes/typed/apps/v1beta2
+  - kubernetes/typed/apps/v1beta2/fake
   - kubernetes/typed/authentication/v1
+  - kubernetes/typed/authentication/v1/fake
   - kubernetes/typed/authentication/v1beta1
+  - kubernetes/typed/authentication/v1beta1/fake
   - kubernetes/typed/authorization/v1
+  - kubernetes/typed/authorization/v1/fake
   - kubernetes/typed/authorization/v1beta1
+  - kubernetes/typed/authorization/v1beta1/fake
   - kubernetes/typed/autoscaling/v1
+  - kubernetes/typed/autoscaling/v1/fake
   - kubernetes/typed/autoscaling/v2beta1
+  - kubernetes/typed/autoscaling/v2beta1/fake
   - kubernetes/typed/batch/v1
+  - kubernetes/typed/batch/v1/fake
   - kubernetes/typed/batch/v1beta1
+  - kubernetes/typed/batch/v1beta1/fake
   - kubernetes/typed/batch/v2alpha1
+  - kubernetes/typed/batch/v2alpha1/fake
   - kubernetes/typed/certificates/v1beta1
+  - kubernetes/typed/certificates/v1beta1/fake
   - kubernetes/typed/core/v1
+  - kubernetes/typed/core/v1/fake
   - kubernetes/typed/events/v1beta1
+  - kubernetes/typed/events/v1beta1/fake
   - kubernetes/typed/extensions/v1beta1
+  - kubernetes/typed/extensions/v1beta1/fake
   - kubernetes/typed/networking/v1
+  - kubernetes/typed/networking/v1/fake
   - kubernetes/typed/policy/v1beta1
+  - kubernetes/typed/policy/v1beta1/fake
   - kubernetes/typed/rbac/v1
+  - kubernetes/typed/rbac/v1/fake
   - kubernetes/typed/rbac/v1alpha1
+  - kubernetes/typed/rbac/v1alpha1/fake
   - kubernetes/typed/rbac/v1beta1
+  - kubernetes/typed/rbac/v1beta1/fake
   - kubernetes/typed/scheduling/v1alpha1
+  - kubernetes/typed/scheduling/v1alpha1/fake
   - kubernetes/typed/settings/v1alpha1
+  - kubernetes/typed/settings/v1alpha1/fake
   - kubernetes/typed/storage/v1
+  - kubernetes/typed/storage/v1/fake
   - kubernetes/typed/storage/v1alpha1
+  - kubernetes/typed/storage/v1alpha1/fake
   - kubernetes/typed/storage/v1beta1
+  - kubernetes/typed/storage/v1beta1/fake
   - listers/admissionregistration/v1alpha1
   - listers/admissionregistration/v1beta1
   - listers/apps/v1
@@ -750,6 +791,7 @@ imports:
   - pkg/version
   - rest
   - rest/watch
+  - testing
   - tools/auth
   - tools/cache
   - tools/clientcmd
@@ -775,6 +817,29 @@ imports:
   - pkg/util/proto
 - name: k8s.io/kubernetes
   version: 925c127ec6b946659ad0fd596fa959be43f0cc05
+  subpackages:
+  - pkg/api/legacyscheme
+  - pkg/apis/apps
+  - pkg/apis/apps/install
+  - pkg/apis/apps/v1
+  - pkg/apis/apps/v1beta1
+  - pkg/apis/apps/v1beta2
+  - pkg/apis/autoscaling
+  - pkg/apis/batch
+  - pkg/apis/batch/install
+  - pkg/apis/batch/v1
+  - pkg/apis/batch/v1beta1
+  - pkg/apis/batch/v2alpha1
+  - pkg/apis/core
+  - pkg/apis/core/install
+  - pkg/apis/core/v1
+  - pkg/apis/extensions
+  - pkg/apis/extensions/install
+  - pkg/apis/extensions/v1beta1
+  - pkg/apis/networking
+  - pkg/features
+  - pkg/util/parsers
+  - pkg/util/pointer
 testImports:
-- name: github.com/onsi/ginkgo
-  version: 9eda700730cba42af70d53180f9dcce9266bc2bc
+- name: github.com/stretchr/testify
+  version: b91bfb9ebec76498946beb6af7c0230c7cc7ba6c

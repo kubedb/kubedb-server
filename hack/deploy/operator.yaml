@@ -28,6 +28,11 @@ spec:
         - --tls-private-key-file=/var/serving-cert/tls.key
         - --v=3
         image: kubedb/kubedb-server:canary
+        env:
+        - name: SERVICE_ACCOUNT_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.serviceAccountName
         ports:
         - containerPort: 8443
         volumeMounts:

@@ -10,6 +10,7 @@ import (
 	"github.com/appscode/kutil/tools/analytics"
 	"github.com/jpillora/go-ogle-analytics"
 	"github.com/kubedb/apimachinery/client/clientset/versioned/scheme"
+	"github.com/kubedb/kubedb-server/pkg/admission/plugin/dormant-database"
 	"github.com/kubedb/kubedb-server/pkg/admission/plugin/elasticsearch"
 	"github.com/kubedb/kubedb-server/pkg/admission/plugin/memcached"
 	"github.com/kubedb/kubedb-server/pkg/admission/plugin/mongodb"
@@ -67,6 +68,7 @@ func NewRootCmd(version string) *cobra.Command {
 		&postgres.PostgresValidator{},
 		&redis.RedisValidator{},
 		&snapshot.SnapshotValidator{},
+		&dormant_database.DormantDatabaseValidator{},
 	)
 	cmd.Use = "run"
 	cmd.Long = "Launch KubeDB apiserver"
