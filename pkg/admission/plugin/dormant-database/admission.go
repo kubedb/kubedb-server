@@ -88,11 +88,11 @@ func (a *DormantDatabaseValidator) Admit(req *admission.AdmissionRequest) *admis
 	case admission.Update:
 		// validate the operation made by User
 		if !util.IsKubeDBOperator(req.UserInfo) {
-			obj, err := meta_util.UnmarshalToJSON(req.Object.Raw, api.SchemeGroupVersion)
+			obj, err := meta_util.UnmarshalFromJSON(req.Object.Raw, api.SchemeGroupVersion)
 			if err != nil {
 				return hookapi.StatusBadRequest(err)
 			}
-			OldObj, err := meta_util.UnmarshalToJSON(req.OldObject.Raw, api.SchemeGroupVersion)
+			OldObj, err := meta_util.UnmarshalFromJSON(req.OldObject.Raw, api.SchemeGroupVersion)
 			if err != nil {
 				return hookapi.StatusBadRequest(err)
 			}

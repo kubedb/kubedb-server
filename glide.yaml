@@ -46,6 +46,8 @@ import:
   repo: https://github.com/appscode/go-version.git
   vcs: git
   version: master
+- package: github.com/cpuguy83/go-md2man
+  version: v1.0.4
 testImport:
 - package: github.com/stretchr/testify
   version: v1.2.0

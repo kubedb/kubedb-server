@@ -79,13 +79,13 @@ func (a *MongoDBValidator) Admit(req *admission.AdmissionRequest) *admission.Adm
 			return hookapi.StatusBadRequest(fmt.Errorf(`mongodb "%s" can't be paused. To continue delete, unset spec.doNotPause and retry`, req.Name))
 		}
 	default:
-		obj, err := meta_util.UnmarshalToJSON(req.Object.Raw, api.SchemeGroupVersion)
+		obj, err := meta_util.UnmarshalFromJSON(req.Object.Raw, api.SchemeGroupVersion)
 		if err != nil {
 			return hookapi.StatusBadRequest(err)
 		}
 		if req.Operation == admission.Update && !util.IsKubeDBOperator(req.UserInfo) {
 			// validate changes made by user
-			oldObject, err := meta_util.UnmarshalToJSON(req.OldObject.Raw, api.SchemeGroupVersion)
+			oldObject, err := meta_util.UnmarshalFromJSON(req.OldObject.Raw, api.SchemeGroupVersion)
 			if err != nil {
 				return hookapi.StatusBadRequest(err)
 			}
