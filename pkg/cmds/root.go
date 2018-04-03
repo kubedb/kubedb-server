@@ -10,15 +10,15 @@ import (
 	"github.com/appscode/kutil/tools/analytics"
 	"github.com/jpillora/go-ogle-analytics"
 	"github.com/kubedb/apimachinery/client/clientset/versioned/scheme"
-	"github.com/kubedb/kubedb-server/pkg/admission/plugin/dormant-database"
+	"github.com/kubedb/apimachinery/pkg/admission/dormantdatabase"
+	"github.com/kubedb/apimachinery/pkg/admission/snapshot"
 	"github.com/kubedb/kubedb-server/pkg/admission/plugin/elasticsearch"
 	"github.com/kubedb/kubedb-server/pkg/admission/plugin/memcached"
-	"github.com/kubedb/kubedb-server/pkg/admission/plugin/mongodb"
 	"github.com/kubedb/kubedb-server/pkg/admission/plugin/mysql"
 	"github.com/kubedb/kubedb-server/pkg/admission/plugin/postgres"
 	"github.com/kubedb/kubedb-server/pkg/admission/plugin/redis"
-	"github.com/kubedb/kubedb-server/pkg/admission/plugin/snapshot"
 	"github.com/kubedb/kubedb-server/pkg/cmds/server"
+	mgAdmsn "github.com/kubedb/mongodb/pkg/admission"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	genericapiserver "k8s.io/apiserver/pkg/server"
@@ -63,12 +63,13 @@ func NewRootCmd(version string) *cobra.Command {
 	cmd := server.NewCommandStartAdmissionServer(os.Stdout, os.Stderr, stopCh,
 		&elasticsearch.ElasticsearchValidator{},
 		&memcached.MemcachedValidator{},
-		&mongodb.MongoDBValidator{}, &mongodb.MongoDBMutator{},
+		&mgAdmsn.MongoDBValidator{},
+		&mgAdmsn.MongoDBMutator{},
 		&mysql.MySQLValidator{},
 		&postgres.PostgresValidator{},
 		&redis.RedisValidator{},
 		&snapshot.SnapshotValidator{},
-		&dormant_database.DormantDatabaseValidator{},
+		&dormantdatabase.DormantDatabaseValidator{},
 	)
 	cmd.Use = "run"
 	cmd.Long = "Launch KubeDB apiserver"

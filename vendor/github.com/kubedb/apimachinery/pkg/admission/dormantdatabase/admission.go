@@ -1,4 +1,4 @@
-package dormant_database
+package dormantdatabase
 
 import (
 	"fmt"
@@ -10,8 +10,7 @@ import (
 	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	cs "github.com/kubedb/apimachinery/client/clientset/versioned"
 	"github.com/kubedb/apimachinery/client/clientset/versioned/typed/kubedb/v1alpha1/util"
-	updUtil "github.com/kubedb/kubedb-server/pkg/admission/util"
-	mgv "github.com/kubedb/mongodb/pkg/validator"
+	plugin "github.com/kubedb/apimachinery/pkg/admission"
 	admission "k8s.io/api/admission/v1beta1"
 	coreV1 "k8s.io/api/core/v1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
@@ -99,7 +98,7 @@ func (a *DormantDatabaseValidator) Admit(req *admission.AdmissionRequest) *admis
 		if err != nil {
 			return hookapi.StatusBadRequest(err)
 		}
-		if err := updUtil.ValidateUpdate(obj, OldObj, req.Kind.Kind); err != nil {
+		if err := plugin.ValidateUpdate(obj, OldObj, req.Kind.Kind); err != nil {
 			return hookapi.StatusBadRequest(fmt.Errorf("%v", err))
 		}
 	}
@@ -134,9 +133,9 @@ func (a *DormantDatabaseValidator) setOwnerReferenceToObjects(ddb *api.DormantDa
 	labelSelector := labels.SelectorFromSet(labelMap)
 
 	// Get object reference of dormant database
-	ref, err := reference.GetReference(clientsetscheme.Scheme, ddb)
-	if err != nil {
-		return err
+	ref, rerr := reference.GetReference(clientsetscheme.Scheme, ddb)
+	if rerr != nil {
+		return rerr
 	}
 
 	// Set Owner Reference of Snapshots to this Dormant Database Object
@@ -176,27 +175,10 @@ func (a *DormantDatabaseValidator) setOwnerReferenceToObjects(ddb *api.DormantDa
 	}
 
 	// Set Owner Reference of Secret to this Dormant Database Object
-	// KubeDB-Operator has set label-selector to only those secrets,
-	// that are created by Kube-DB operator.
-	return setOwnerReferenceToSecret(a.client, a.extClient, ddb, dbKind)
-}
-
-// setOwnerReferenceToSecret will set owner reference to secrets only if there is no other database or
-// dormant database using this Secret.
-// Yet, User can reuse those secret for other database objects.
-// So make sure before deleting that nobody else is using these.
-func setOwnerReferenceToSecret(client kubernetes.Interface, extClient cs.Interface, ddb *api.DormantDatabase, dbKind string) error {
-	if dbKind == api.ResourceKindMemcached || dbKind == api.ResourceKindRedis {
-		return nil
+	// only if the secret is not used by other xDB (Similar kind) or DormantDB
+	if err := a.sterilizeSecrets(ddb); err != nil {
+		return err
 	}
-	switch dbKind {
-	case api.ResourceKindMongoDB:
-		if err := mgv.SterilizeSecrets(client, extClient.KubedbV1alpha1(), ddb); err != nil {
-			return err
-		}
-		//todo: add other cases
-	}
-
 	return nil
 }
 
@@ -213,9 +195,9 @@ func (a *DormantDatabaseValidator) removeOwnerReferenceFromObjects(ddb *api.Dorm
 	labelSelector := labels.SelectorFromSet(labelMap)
 
 	// Get object reference of dormant database
-	ref, err := reference.GetReference(clientsetscheme.Scheme, ddb)
-	if err != nil {
-		return err
+	ref, rerr := reference.GetReference(clientsetscheme.Scheme, ddb)
+	if rerr != nil {
+		return rerr
 	}
 
 	// Set Owner Reference of Snapshots to this Dormant Database Object
@@ -291,4 +273,144 @@ func getDatabaseSecretName(ddb *api.DormantDatabase, dbKind string) *coreV1.Secr
 		return ddb.Spec.Origin.Spec.Elasticsearch.DatabaseSecret
 	}
 	return nil
+}
+
+// SterilizeSecrets cleans secret that is created for this Ex-MongoDB (now DormantDatabase) database by KubeDB-Operator and
+// not used by any other MongoDB or DormantDatabases objects.
+func (a *DormantDatabaseValidator) sterilizeSecrets(ddb *api.DormantDatabase) error {
+	secretFound := false
+
+	// Get object reference of dormant database
+	ref, rerr := reference.GetReference(clientsetscheme.Scheme, ddb)
+	if rerr != nil {
+		return rerr
+	}
+
+	dbKind, err := meta_util.GetStringValue(ddb.ObjectMeta.Labels, api.LabelDatabaseKind)
+	if err != nil {
+		return err
+	}
+
+	secretVolume := getDatabaseSecretName(ddb, dbKind)
+	if secretVolume == nil {
+		return nil
+	}
+
+	secret, err := a.client.CoreV1().Secrets(ddb.Namespace).Get(secretVolume.SecretName, metav1.GetOptions{})
+	if err != nil && kerr.IsNotFound(err) {
+		return nil
+	} else if err != nil {
+		return err
+	}
+
+	// if api.LabelDatabaseKind not exists in secret, then the secret is not created by KubeDB-Operator
+	// otherwise, probably KubeDB-Operator created the secrets.
+	if _, err := meta_util.GetStringValue(secret.ObjectMeta.Labels, api.LabelDatabaseKind); err != nil {
+		return nil
+	}
+
+	secretFound, err = a.isSecretUsedInExistingDB(ddb, dbKind, secretVolume)
+	if err != nil {
+		return err
+	}
+
+	if !secretFound {
+		labelMap := map[string]string{
+			api.LabelDatabaseKind: dbKind,
+		}
+		dormantDatabaseList, err := a.extClient.KubedbV1alpha1().DormantDatabases(ddb.Namespace).List(
+			metav1.ListOptions{
+				LabelSelector: labels.SelectorFromSet(labelMap).String(),
+			},
+		)
+		if err != nil {
+			return err
+		}
+
+		for _, ddb := range dormantDatabaseList.Items {
+			if ddb.Name == ddb.Name {
+				continue
+			}
+
+			databaseSecret := getDatabaseSecretName(&ddb, dbKind)
+			if databaseSecret != nil {
+				if databaseSecret.SecretName == secretVolume.SecretName {
+					secretFound = true
+					break
+				}
+			}
+		}
+	}
+
+	if !secretFound {
+		if _, _, err := core_util.PatchSecret(a.client, secret, func(in *coreV1.Secret) *coreV1.Secret {
+			in.ObjectMeta = core_util.EnsureOwnerReference(in.ObjectMeta, ref)
+			return in
+		}); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (a *DormantDatabaseValidator) isSecretUsedInExistingDB(ddb *api.DormantDatabase, dbKind string, secretVolume *coreV1.SecretVolumeSource) (bool, error) {
+	if dbKind == api.ResourceKindMemcached || dbKind == api.ResourceKindRedis {
+		return false, nil
+	}
+	switch dbKind {
+	case api.ResourceKindMongoDB:
+		mgList, err := a.extClient.KubedbV1alpha1().MongoDBs(ddb.Namespace).List(metav1.ListOptions{})
+		if err != nil {
+			return true, err
+		}
+		for _, mg := range mgList.Items {
+			databaseSecret := mg.Spec.DatabaseSecret
+			if databaseSecret != nil {
+				if databaseSecret.SecretName == secretVolume.SecretName {
+					return true, nil
+				}
+			}
+		}
+	case api.ResourceKindMySQL:
+		msList, err := a.extClient.KubedbV1alpha1().MySQLs(ddb.Namespace).List(metav1.ListOptions{})
+		if err != nil {
+			return true, err
+		}
+		for _, ms := range msList.Items {
+			databaseSecret := ms.Spec.DatabaseSecret
+			if databaseSecret != nil {
+				if databaseSecret.SecretName == secretVolume.SecretName {
+					return true, nil
+				}
+			}
+		}
+	case api.ResourceKindPostgres:
+		pgList, err := a.extClient.KubedbV1alpha1().Postgreses(ddb.Namespace).List(metav1.ListOptions{})
+		if err != nil {
+			return true, err
+		}
+		for _, pg := range pgList.Items {
+			databaseSecret := pg.Spec.DatabaseSecret
+			if databaseSecret != nil {
+				if databaseSecret.SecretName == secretVolume.SecretName {
+					return true, nil
+				}
+			}
+		}
+	case api.ResourceKindElasticsearch:
+		esList, err := a.extClient.KubedbV1alpha1().Elasticsearches(ddb.Namespace).List(metav1.ListOptions{})
+		if err != nil {
+			return true, err
+		}
+		for _, es := range esList.Items {
+			databaseSecret := es.Spec.DatabaseSecret
+			if databaseSecret != nil {
+				if databaseSecret.SecretName == secretVolume.SecretName {
+					return true, nil
+				}
+			}
+		}
+	}
+	return false, nil
 }

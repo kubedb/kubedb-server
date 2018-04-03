@@ -9,8 +9,8 @@ import (
 	meta_util "github.com/appscode/kutil/meta"
 	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	cs "github.com/kubedb/apimachinery/client/clientset/versioned"
+	plugin "github.com/kubedb/apimachinery/pkg/admission"
 	amv "github.com/kubedb/apimachinery/pkg/validator"
-	"github.com/kubedb/kubedb-server/pkg/admission/util"
 	admission "k8s.io/api/admission/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -79,7 +79,7 @@ func (a *SnapshotValidator) Admit(req *admission.AdmissionRequest) *admission.Ad
 		if err != nil {
 			return hookapi.StatusBadRequest(err)
 		}
-		if err := util.ValidateUpdate(obj, oldObject, req.Kind.Kind); err != nil {
+		if err := plugin.ValidateUpdate(obj, oldObject, req.Kind.Kind); err != nil {
 			return hookapi.StatusBadRequest(fmt.Errorf("%v", err))
 		}
 		// Skip checking validation if Spec is not changed
@@ -121,6 +121,7 @@ func (a *SnapshotValidator) validateSnapshot(snapshot *api.Snapshot) error {
 		return fmt.Errorf("'%v:XDB' label is missing", api.LabelDatabaseKind)
 	}
 
+	// Check if DB exists
 	switch kind {
 	case api.ResourceKindElasticsearch:
 		if _, err := a.extClient.KubedbV1alpha1().Elasticsearches(snapshot.Namespace).Get(databaseName, metav1.GetOptions{}); err != nil {

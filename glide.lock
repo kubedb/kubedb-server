@@ -1,5 +1,5 @@
-hash: 8d55ad0936cb4cc2fa13a3680cf5a5ca0d6dcd91e72bef22c61e8ff4b6d27517
-updated: 2018-04-02T18:25:11.132939241-07:00
+hash: ac4aef05e6217b7f3f7c598b9da806b14c676c42226ab684ca403d8381b0f530
+updated: 2018-04-03T11:32:08.098522604-07:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
@@ -280,7 +280,7 @@ imports:
 - name: github.com/juju/ratelimit
   version: 5b9ff866471762aa2ab2dced63c9fb6f53921342
 - name: github.com/kubedb/apimachinery
-  version: 3fc73e4362bbd370598eaddb845b6ecc9c07006e
+  version: 3f1720706c6de2a19adda06600f8310fe4cabf45
   subpackages:
   - apis/kubedb
   - apis/kubedb/v1alpha1
@@ -290,6 +290,9 @@ imports:
   - client/clientset/versioned/typed/kubedb/v1alpha1
   - client/clientset/versioned/typed/kubedb/v1alpha1/fake
   - client/clientset/versioned/typed/kubedb/v1alpha1/util
+  - pkg/admission
+  - pkg/admission/dormantdatabase
+  - pkg/admission/snapshot
   - pkg/storage
   - pkg/validator
 - name: github.com/kubedb/elasticsearch
@@ -301,10 +304,9 @@ imports:
   subpackages:
   - pkg/validator
 - name: github.com/kubedb/mongodb
-  version: 8adbd1bdb4c483347821f827d0ed16b369adff43
+  version: 310843b86edfafd7ed5d0950526f209c9c4e363a
   subpackages:
-  - pkg/mutator
-  - pkg/validator
+  - pkg/admission
 - name: github.com/kubedb/mysql
   version: b4b749dff97bd2ed8a91ae418be86e1bb1f03bbd
   subpackages:
@@ -380,7 +382,7 @@ imports:
   subpackages:
   - doc
 - name: github.com/spf13/pflag
-  version: 1cd4a0c365d95803411bec89fb7b76bade17053b
+  version: 1ce0cc6db4029d97571db82f85092fccedb572ce
 - name: github.com/ugorji/go
   version: ded73eae5db7e7a0ef6f55aace87a2873c5d2b74
   subpackages:
