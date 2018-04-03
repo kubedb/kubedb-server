@@ -2,7 +2,6 @@ package memcached
 
 import (
 	"net/http"
-	"os"
 	"testing"
 
 	kubeMon "github.com/appscode/kube-mon/api"
@@ -10,7 +9,6 @@ import (
 	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	extFake "github.com/kubedb/apimachinery/client/clientset/versioned/fake"
 	"github.com/kubedb/apimachinery/client/clientset/versioned/scheme"
-	"github.com/kubedb/kubedb-server/pkg/admission/util"
 	admission "k8s.io/api/admission/v1beta1"
 	authenticationV1 "k8s.io/api/authentication/v1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
@@ -22,8 +20,6 @@ import (
 
 func init() {
 	scheme.AddToScheme(clientSetScheme.Scheme)
-	os.Setenv(util.EnvSvcAccountName, "kubedb-operator")
-	os.Setenv("KUBE_NAMESPACE", "kube-system")
 }
 
 var requestKind = metaV1.GroupVersionKind{
@@ -56,7 +52,7 @@ func TestMemcachedValidator_Admit(t *testing.T) {
 			req.Name = c.objectName
 			req.Namespace = c.namespace
 			req.Operation = c.operation
-			req.UserInfo = c.userInfo
+			req.UserInfo = authenticationV1.UserInfo{}
 			req.Object.Raw = objJS
 			req.OldObject.Raw = oldObjJS
 
@@ -93,194 +89,106 @@ var cases = []struct {
 	objectName string
 	namespace  string
 	operation  admission.Operation
-	userInfo   authenticationV1.UserInfo
 	object     api.Memcached
 	oldObject  api.Memcached
 	heatUp     bool
 	result     bool
 }{
-	{"Create Valid Memcached By User",
+	{"Create Valid Memcached",
 		requestKind,
 		"foo",
 		"default",
 		admission.Create,
-		userIsHooman(),
 		sampleMemcached(),
 		api.Memcached{},
 		false,
 		true,
 	},
-	{"Create Invalid Memcached By User",
+	{"Create Invalid Memcached",
 		requestKind,
 		"foo",
 		"default",
 		admission.Create,
-		userIsHooman(),
 		getAwkwardMemcached(),
 		api.Memcached{},
 		false,
 		false,
 	},
-	{"Create Invalid Memcached By Operator",
-		requestKind,
-		"foo",
-		"default",
-		admission.Create,
-		userIsHooman(),
-		getAwkwardMemcached(),
-		api.Memcached{},
-		false,
-		false,
-	},
-	{"Edit Memcached Spec.Version By User",
+	{"Edit Memcached Spec.Version",
 		requestKind,
 		"foo",
 		"default",
 		admission.Update,
-		userIsHooman(),
 		editSpecVersion(sampleMemcached()),
 		sampleMemcached(),
 		false,
 		false,
 	},
-	{"Edit Status By User",
+	{"Edit Status",
 		requestKind,
 		"foo",
 		"default",
 		admission.Update,
-		userIsHooman(),
-		editStatus(sampleMemcached()),
-		sampleMemcached(),
-		false,
-		false,
-	},
-	{"Edit Status By Operator",
-		requestKind,
-		"foo",
-		"default",
-		admission.Update,
-		userIsOperator(),
 		editStatus(sampleMemcached()),
 		sampleMemcached(),
 		false,
 		true,
 	},
-	{"Edit Spec.Monitor By User",
+	{"Edit Spec.Monitor",
 		requestKind,
 		"foo",
 		"default",
 		admission.Update,
-		userIsHooman(),
 		editSpecMonitor(sampleMemcached()),
 		sampleMemcached(),
 		false,
 		true,
 	},
-	{"Edit Spec.Monitor By Operator",
+	{"Edit Invalid Spec.Monitor",
 		requestKind,
 		"foo",
 		"default",
 		admission.Update,
-		userIsOperator(),
-		editSpecMonitor(sampleMemcached()),
-		sampleMemcached(),
-		false,
-		true,
-	},
-	{"Edit Invalid Spec.Monitor By User",
-		requestKind,
-		"foo",
-		"default",
-		admission.Update,
-		userIsHooman(),
 		editSpecInvalidMonitor(sampleMemcached()),
 		sampleMemcached(),
 		false,
 		false,
 	},
-	{"Edit Invalid Spec.Monitor By Operator",
+	{"Edit Spec.DoNotPause",
 		requestKind,
 		"foo",
 		"default",
 		admission.Update,
-		userIsOperator(),
-		editSpecInvalidMonitor(sampleMemcached()),
-		sampleMemcached(),
-		false,
-		false,
-	},
-	{"Edit Spec.DoNotPause By User",
-		requestKind,
-		"foo",
-		"default",
-		admission.Update,
-		userIsHooman(),
 		editSpecDoNotPause(sampleMemcached()),
 		sampleMemcached(),
 		false,
 		true,
 	},
-	{"Delete Memcached when Spec.DoNotPause=true by Operator",
+	{"Delete Memcached when Spec.DoNotPause=true",
 		requestKind,
 		"foo",
 		"default",
 		admission.Delete,
-		userIsOperator(),
 		sampleMemcached(),
 		api.Memcached{},
 		true,
 		false,
 	},
-	{"Delete Memcached when Spec.DoNotPause=true by User",
+	{"Delete Memcached when Spec.DoNotPause=false",
 		requestKind,
 		"foo",
 		"default",
 		admission.Delete,
-		userIsHooman(),
-		sampleMemcached(),
-		api.Memcached{},
-		true,
-		false,
-	},
-	{"Delete Memcached when Spec.DoNotPause=false by Operator",
-		requestKind,
-		"foo",
-		"default",
-		admission.Delete,
-		userIsOperator(),
 		editSpecDoNotPause(sampleMemcached()),
 		api.Memcached{},
 		true,
 		true,
 	},
-	{"Delete Memcached when Spec.DoNotPause=false by User",
+	{"Delete Non Existing Memcached",
 		requestKind,
 		"foo",
 		"default",
 		admission.Delete,
-		userIsHooman(),
-		editSpecDoNotPause(sampleMemcached()),
-		api.Memcached{},
-		true,
-		true,
-	},
-	{"Delete Non Existing Memcached By Operator",
-		requestKind,
-		"foo",
-		"default",
-		admission.Delete,
-		userIsOperator(),
-		api.Memcached{},
-		api.Memcached{},
-		false,
-		true,
-	},
-	{"Delete Non Existing Memcached By User",
-		requestKind,
-		"foo",
-		"default",
-		admission.Delete,
-		userIsHooman(),
 		api.Memcached{},
 		api.Memcached{},
 		false,
@@ -309,9 +217,9 @@ func sampleMemcached() api.Memcached {
 }
 
 func getAwkwardMemcached() api.Memcached {
-	redis := sampleMemcached()
-	redis.Spec.Version = "4.4"
-	return redis
+	memcached := sampleMemcached()
+	memcached.Spec.Version = "3.0"
+	return memcached
 }
 
 func editSpecVersion(old api.Memcached) api.Memcached {
@@ -344,25 +252,4 @@ func editSpecInvalidMonitor(old api.Memcached) api.Memcached {
 func editSpecDoNotPause(old api.Memcached) api.Memcached {
 	old.Spec.DoNotPause = false
 	return old
-}
-
-func userIsOperator() authenticationV1.UserInfo {
-	return authenticationV1.UserInfo{
-		Username: "system:serviceaccount:kube-system:kubedb-operator",
-		Groups: []string{
-			"system:serviceaccounts",
-			"system:serviceaccounts:kube-system",
-			"system:authenticated",
-		},
-	}
-}
-
-func userIsHooman() authenticationV1.UserInfo {
-	return authenticationV1.UserInfo{
-		Username: "minikube-user",
-		Groups: []string{
-			"system:masters",
-			"system:authenticated",
-		},
-	}
 }

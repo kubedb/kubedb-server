@@ -7,7 +7,7 @@ import:
   repo: https://github.com/tamalsaha/prometheus-operator.git
   version: k-1.9
 - package: github.com/kubedb/apimachinery
-  version: 0.8.0-beta.2
+  version: master
 - package: github.com/kubedb/elasticsearch
   version: 0.8.0-beta.2
 - package: github.com/kubedb/postgres
@@ -15,7 +15,7 @@ import:
 - package: github.com/kubedb/mysql
   version: 0.1.0-beta.2
 - package: github.com/kubedb/mongodb
-  version: 0.1.0-beta.2
+  version: mutate
 - package: github.com/kubedb/redis
   version: 0.1.0-beta.2
 - package: github.com/kubedb/memcached
@@ -39,6 +39,8 @@ import:
 - package: k8s.io/kubernetes
   version: v1.9.0
 - package: github.com/appscode/kutil
+  version: release-6.0
+- package: github.com/appscode/kubernetes-webhook-util
   version: release-6.0
 - package: github.com/appscode/kube-mon
   version: release-6.0

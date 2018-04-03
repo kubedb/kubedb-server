@@ -2,14 +2,12 @@ package dormant_database
 
 import (
 	"net/http"
-	"os"
 	"testing"
 
 	"github.com/appscode/kutil/meta"
 	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	ext_fake "github.com/kubedb/apimachinery/client/clientset/versioned/fake"
 	"github.com/kubedb/apimachinery/client/clientset/versioned/scheme"
-	"github.com/kubedb/kubedb-server/pkg/admission/util"
 	admission "k8s.io/api/admission/v1beta1"
 	authenticationv1 "k8s.io/api/authentication/v1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
@@ -21,8 +19,6 @@ import (
 
 func init() {
 	scheme.AddToScheme(clientsetscheme.Scheme)
-	os.Setenv(util.EnvSvcAccountName, "kubedb-operator")
-	os.Setenv("KUBE_NAMESPACE", "kube-system")
 }
 
 var requestKind = metav1.GroupVersionKind{
@@ -54,7 +50,7 @@ func TestDormantDatabaseValidator_Admit(t *testing.T) {
 			req.Name = c.objectName
 			req.Namespace = c.namespace
 			req.Operation = c.operation
-			req.UserInfo = c.userInfo
+			req.UserInfo = authenticationv1.UserInfo{}
 			req.Object.Raw = objJS
 			req.OldObject.Raw = oldObjJS
 
@@ -91,161 +87,76 @@ var cases = []struct {
 	objectName string
 	namespace  string
 	operation  admission.Operation
-	userInfo   authenticationv1.UserInfo
 	object     api.DormantDatabase
 	oldObject  api.DormantDatabase
 	heatUp     bool
 	result     bool
 }{
-	{"Create Dormant Database By Operator",
+	{"Create Dormant Database",
 		requestKind,
 		"foo",
 		"default",
 		admission.Create,
-		userIsOperator(),
 		sampleDormantDatabase(),
 		api.DormantDatabase{},
 		false,
 		true,
 	},
-	{"Create Dormant Database By User",
-		requestKind,
-		"foo",
-		"default",
-		admission.Create,
-		userIsHooman(),
-		sampleDormantDatabase(),
-		api.DormantDatabase{},
-		false,
-		false,
-	},
-	{"Edit Status By Operator",
+	{"Edit Status",
 		requestKind,
 		"foo",
 		"default",
 		admission.Update,
-		userIsOperator(),
 		editStatus(sampleDormantDatabase()),
 		sampleDormantDatabase(),
 		false,
 		true,
 	},
-	{"Edit Status By User",
+	{"Edit Spec.Origin ",
 		requestKind,
 		"foo",
 		"default",
 		admission.Update,
-		userIsHooman(),
-		editStatus(sampleDormantDatabase()),
-		sampleDormantDatabase(),
-		false,
-		false,
-	},
-	{"Edit Spec.Origin By User",
-		requestKind,
-		"foo",
-		"default",
-		admission.Update,
-		userIsHooman(),
 		editSpecOrigin(sampleDormantDatabase()),
 		sampleDormantDatabase(),
 		false,
 		false,
 	},
-	{"Edit Spec.Resume By Operator",
+	{"Edit Spec.WipeOut",
 		requestKind,
 		"foo",
 		"default",
 		admission.Update,
-		userIsOperator(),
-		editSpecResume(sampleDormantDatabase()),
-		sampleDormantDatabase(),
-		false,
-		true,
-	},
-	{"Edit Spec.Resume By User",
-		requestKind,
-		"foo",
-		"default",
-		admission.Update,
-		userIsHooman(),
-		editSpecResume(sampleDormantDatabase()),
-		sampleDormantDatabase(),
-		false,
-		true,
-	},
-	{"Edit Spec.WipeOut By Operator",
-		requestKind,
-		"foo",
-		"default",
-		admission.Update,
-		userIsOperator(),
 		editSpecWipeOut(sampleDormantDatabase()),
 		sampleDormantDatabase(),
 		false,
 		true,
 	},
-	{"Edit Spec.WipeOut By User",
-		requestKind,
-		"foo",
-		"default",
-		admission.Update,
-		userIsHooman(),
-		editSpecWipeOut(sampleDormantDatabase()),
-		sampleDormantDatabase(),
-		false,
-		true,
-	},
-	{"Delete Without Wiping By Operator",
+	{"Delete Without Wiping Out",
 		requestKind,
 		"foo",
 		"default",
 		admission.Delete,
-		userIsOperator(),
 		sampleDormantDatabase(),
 		api.DormantDatabase{},
 		true,
 		true,
 	},
-	{"Delete Without Wiping By User",
+	{"Delete With Wiping Out ",
 		requestKind,
 		"foo",
 		"default",
 		admission.Delete,
-		userIsHooman(),
-		sampleDormantDatabase(),
-		api.DormantDatabase{},
-		true,
-		false,
-	},
-	{"Delete With Wiping By User",
-		requestKind,
-		"foo",
-		"default",
-		admission.Delete,
-		userIsHooman(),
 		editStatusWipedOut(sampleDormantDatabase()),
 		api.DormantDatabase{},
 		true,
 		true,
 	},
-	{"Delete Non Existing Dormant By Operator",
+	{"Delete Non Existing Dormant",
 		requestKind,
 		"foo",
 		"default",
 		admission.Delete,
-		userIsOperator(),
-		api.DormantDatabase{},
-		api.DormantDatabase{},
-		false,
-		true,
-	},
-	{"Delete Non Existing Dormant By User",
-		requestKind,
-		"foo",
-		"default",
-		admission.Delete,
-		userIsHooman(),
 		api.DormantDatabase{},
 		api.DormantDatabase{},
 		false,
@@ -302,34 +213,8 @@ func editSpecWipeOut(old api.DormantDatabase) api.DormantDatabase {
 	return old
 }
 
-func editSpecResume(old api.DormantDatabase) api.DormantDatabase {
-	old.Spec.Resume = true
-	return old
-}
-
 func editStatusWipedOut(old api.DormantDatabase) api.DormantDatabase {
 	old.Spec.WipeOut = true
 	old.Status.Phase = api.DormantDatabasePhaseWipedOut
 	return old
-}
-
-func userIsOperator() authenticationv1.UserInfo {
-	return authenticationv1.UserInfo{
-		Username: "system:serviceaccount:kube-system:kubedb-operator",
-		Groups: []string{
-			"system:serviceaccounts",
-			"system:serviceaccounts:kube-system",
-			"system:authenticated",
-		},
-	}
-}
-
-func userIsHooman() authenticationv1.UserInfo {
-	return authenticationv1.UserInfo{
-		Username: "minikube-user",
-		Groups: []string{
-			"system:masters",
-			"system:authenticated",
-		},
-	}
 }

@@ -2,7 +2,6 @@ package redis
 
 import (
 	"net/http"
-	"os"
 	"testing"
 
 	"github.com/appscode/go/types"
@@ -11,7 +10,6 @@ import (
 	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	extFake "github.com/kubedb/apimachinery/client/clientset/versioned/fake"
 	"github.com/kubedb/apimachinery/client/clientset/versioned/scheme"
-	"github.com/kubedb/kubedb-server/pkg/admission/util"
 	admission "k8s.io/api/admission/v1beta1"
 	authenticationV1 "k8s.io/api/authentication/v1"
 	core "k8s.io/api/core/v1"
@@ -26,8 +24,6 @@ import (
 
 func init() {
 	scheme.AddToScheme(clientSetScheme.Scheme)
-	os.Setenv(util.EnvSvcAccountName, "kubedb-operator")
-	os.Setenv("KUBE_NAMESPACE", "kube-system")
 }
 
 var requestKind = metaV1.GroupVersionKind{
@@ -66,7 +62,7 @@ func TestRedisValidator_Admit(t *testing.T) {
 			req.Name = c.objectName
 			req.Namespace = c.namespace
 			req.Operation = c.operation
-			req.UserInfo = c.userInfo
+			req.UserInfo = authenticationV1.UserInfo{}
 			req.Object.Raw = objJS
 			req.OldObject.Raw = oldObjJS
 
@@ -103,194 +99,106 @@ var cases = []struct {
 	objectName string
 	namespace  string
 	operation  admission.Operation
-	userInfo   authenticationV1.UserInfo
 	object     api.Redis
 	oldObject  api.Redis
 	heatUp     bool
 	result     bool
 }{
-	{"Create Valid Redis By User",
+	{"Create Valid Redis",
 		requestKind,
 		"foo",
 		"default",
 		admission.Create,
-		userIsHooman(),
 		sampleRedis(),
 		api.Redis{},
 		false,
 		true,
 	},
-	{"Create Invalid Redis By User",
+	{"Create Invalid Redis",
 		requestKind,
 		"foo",
 		"default",
 		admission.Create,
-		userIsHooman(),
 		getAwkwardRedis(),
 		api.Redis{},
 		false,
 		false,
 	},
-	{"Create Invalid Redis By Operator",
-		requestKind,
-		"foo",
-		"default",
-		admission.Create,
-		userIsHooman(),
-		getAwkwardRedis(),
-		api.Redis{},
-		false,
-		false,
-	},
-	{"Edit Redis Spec.Version By User",
+	{"Edit Redis Spec.Version",
 		requestKind,
 		"foo",
 		"default",
 		admission.Update,
-		userIsHooman(),
 		editSpecVersion(sampleRedis()),
 		sampleRedis(),
 		false,
 		false,
 	},
-	{"Edit Status By User",
+	{"Edit Status",
 		requestKind,
 		"foo",
 		"default",
 		admission.Update,
-		userIsHooman(),
-		editStatus(sampleRedis()),
-		sampleRedis(),
-		false,
-		false,
-	},
-	{"Edit Status By Operator",
-		requestKind,
-		"foo",
-		"default",
-		admission.Update,
-		userIsOperator(),
 		editStatus(sampleRedis()),
 		sampleRedis(),
 		false,
 		true,
 	},
-	{"Edit Spec.Monitor By User",
+	{"Edit Spec.Monitor",
 		requestKind,
 		"foo",
 		"default",
 		admission.Update,
-		userIsHooman(),
 		editSpecMonitor(sampleRedis()),
 		sampleRedis(),
 		false,
 		true,
 	},
-	{"Edit Spec.Monitor By Operator",
+	{"Edit Invalid Spec.Monitor",
 		requestKind,
 		"foo",
 		"default",
 		admission.Update,
-		userIsOperator(),
-		editSpecMonitor(sampleRedis()),
-		sampleRedis(),
-		false,
-		true,
-	},
-	{"Edit Invalid Spec.Monitor By User",
-		requestKind,
-		"foo",
-		"default",
-		admission.Update,
-		userIsHooman(),
 		editSpecInvalidMonitor(sampleRedis()),
 		sampleRedis(),
 		false,
 		false,
 	},
-	{"Edit Invalid Spec.Monitor By Operator",
+	{"Edit Spec.DoNotPause",
 		requestKind,
 		"foo",
 		"default",
 		admission.Update,
-		userIsOperator(),
-		editSpecInvalidMonitor(sampleRedis()),
-		sampleRedis(),
-		false,
-		false,
-	},
-	{"Edit Spec.DoNotPause By User",
-		requestKind,
-		"foo",
-		"default",
-		admission.Update,
-		userIsHooman(),
 		editSpecDoNotPause(sampleRedis()),
 		sampleRedis(),
 		false,
 		true,
 	},
-	{"Delete Redis when Spec.DoNotPause=true by Operator",
+	{"Delete Redis when Spec.DoNotPause=true",
 		requestKind,
 		"foo",
 		"default",
 		admission.Delete,
-		userIsOperator(),
 		sampleRedis(),
 		api.Redis{},
 		true,
 		false,
 	},
-	{"Delete Redis when Spec.DoNotPause=true by User",
+	{"Delete Redis when Spec.DoNotPause=false",
 		requestKind,
 		"foo",
 		"default",
 		admission.Delete,
-		userIsHooman(),
-		sampleRedis(),
-		api.Redis{},
-		true,
-		false,
-	},
-	{"Delete Redis when Spec.DoNotPause=false by Operator",
-		requestKind,
-		"foo",
-		"default",
-		admission.Delete,
-		userIsOperator(),
 		editSpecDoNotPause(sampleRedis()),
 		api.Redis{},
 		true,
 		true,
 	},
-	{"Delete Redis when Spec.DoNotPause=false by User",
+	{"Delete Non Existing Redis",
 		requestKind,
 		"foo",
 		"default",
 		admission.Delete,
-		userIsHooman(),
-		editSpecDoNotPause(sampleRedis()),
-		api.Redis{},
-		true,
-		true,
-	},
-	{"Delete Non Existing Redis By Operator",
-		requestKind,
-		"foo",
-		"default",
-		admission.Delete,
-		userIsOperator(),
-		api.Redis{},
-		api.Redis{},
-		false,
-		true,
-	},
-	{"Delete Non Existing Redis By User",
-		requestKind,
-		"foo",
-		"default",
-		admission.Delete,
-		userIsHooman(),
 		api.Redis{},
 		api.Redis{},
 		false,
@@ -362,25 +270,4 @@ func editSpecInvalidMonitor(old api.Redis) api.Redis {
 func editSpecDoNotPause(old api.Redis) api.Redis {
 	old.Spec.DoNotPause = false
 	return old
-}
-
-func userIsOperator() authenticationV1.UserInfo {
-	return authenticationV1.UserInfo{
-		Username: "system:serviceaccount:kube-system:kubedb-operator",
-		Groups: []string{
-			"system:serviceaccounts",
-			"system:serviceaccounts:kube-system",
-			"system:authenticated",
-		},
-	}
-}
-
-func userIsHooman() authenticationV1.UserInfo {
-	return authenticationV1.UserInfo{
-		Username: "minikube-user",
-		Groups: []string{
-			"system:masters",
-			"system:authenticated",
-		},
-	}
 }

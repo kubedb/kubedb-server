@@ -2,16 +2,18 @@ package snapshot
 
 import (
 	"net/http"
-	"os"
 	"testing"
 
+	"github.com/appscode/go/types"
 	"github.com/appscode/kutil/meta"
 	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
+	extFake "github.com/kubedb/apimachinery/client/clientset/versioned/fake"
 	"github.com/kubedb/apimachinery/client/clientset/versioned/scheme"
-	"github.com/kubedb/kubedb-server/pkg/admission/util"
 	admission "k8s.io/api/admission/v1beta1"
 	authenticationV1 "k8s.io/api/authentication/v1"
 	core "k8s.io/api/core/v1"
+	kerr "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/fake"
@@ -20,8 +22,6 @@ import (
 
 func init() {
 	scheme.AddToScheme(clientSetScheme.Scheme)
-	os.Setenv(util.EnvSvcAccountName, "kubedb-operator")
-	os.Setenv("KUBE_NAMESPACE", "kube-system")
 }
 
 var requestKind = metaV1.GroupVersionKind{
@@ -37,6 +37,7 @@ func TestSnapshotValidator_Admit(t *testing.T) {
 
 			validator.initialized = true
 			validator.client = fake.NewSimpleClientset()
+			validator.extClient = extFake.NewSimpleClientset()
 
 			objJS, err := meta.MarshalToJson(&c.object, api.SchemeGroupVersion)
 			if err != nil {
@@ -53,7 +54,7 @@ func TestSnapshotValidator_Admit(t *testing.T) {
 			req.Name = c.objectName
 			req.Namespace = c.namespace
 			req.Operation = c.operation
-			req.UserInfo = c.userInfo
+			req.UserInfo = authenticationV1.UserInfo{}
 			req.Object.Raw = objJS
 			req.OldObject.Raw = oldObjJS
 
@@ -62,6 +63,12 @@ func TestSnapshotValidator_Admit(t *testing.T) {
 			}
 			if c.operation != admission.Update {
 				req.OldObject = runtime.RawExtension{}
+			}
+
+			if c.heatUp {
+				if _, err := validator.extClient.KubedbV1alpha1().MongoDBs(c.namespace).Create(sampleMongoDB()); err != nil && !kerr.IsAlreadyExists(err) {
+					t.Errorf(err.Error())
+				}
 			}
 
 			response := validator.Admit(req)
@@ -85,117 +92,56 @@ var cases = []struct {
 	objectName string
 	namespace  string
 	operation  admission.Operation
-	userInfo   authenticationV1.UserInfo
 	object     api.Snapshot
 	oldObject  api.Snapshot
 	heatUp     bool
 	result     bool
 }{
-	{"Create Valid Snapshot By User",
+	{"Create Valid Snapshot",
 		requestKind,
 		"foo",
 		"default",
 		admission.Create,
-		userIsHooman(),
 		sampleSnapshot(),
 		api.Snapshot{},
-		false,
+		true,
 		true,
 	},
-	{"Create Valid Snapshot By Operator",
+	{"Create Invalid Snapshot",
 		requestKind,
 		"foo",
 		"default",
 		admission.Create,
-		userIsHooman(),
-		sampleSnapshot(),
-		api.Snapshot{},
-		false,
-		true,
-	},
-	{"Create Invalid Snapshot By User",
-		requestKind,
-		"foo",
-		"default",
-		admission.Create,
-		userIsOperator(),
 		getAwkwardSnapshot(),
 		api.Snapshot{},
 		false,
 		false,
 	},
-	{"Create Invalid Snapshot By Operator",
-		requestKind,
-		"foo",
-		"default",
-		admission.Create,
-		userIsHooman(),
-		getAwkwardSnapshot(),
-		api.Snapshot{},
-		false,
-		false,
-	},
-	{"Edit Status By User",
+	{"Edit Status",
 		requestKind,
 		"foo",
 		"default",
 		admission.Update,
-		userIsHooman(),
-		editStatus(sampleSnapshot()),
-		sampleSnapshot(),
-		false,
-		false,
-	},
-	{"Edit Status By Operator",
-		requestKind,
-		"foo",
-		"default",
-		admission.Update,
-		userIsOperator(),
 		editStatus(sampleSnapshot()),
 		sampleSnapshot(),
 		false,
 		true,
 	},
-	{"Delete Snapshot by Operator",
+	{"Delete Snapshot",
 		requestKind,
 		"foo",
 		"default",
 		admission.Delete,
-		userIsOperator(),
 		sampleSnapshot(),
 		api.Snapshot{},
 		false,
 		true,
 	},
-	{"Delete Snapshot when by User",
+	{"Delete Non Existing Snapshot",
 		requestKind,
 		"foo",
 		"default",
 		admission.Delete,
-		userIsHooman(),
-		sampleSnapshot(),
-		api.Snapshot{},
-		false,
-		true,
-	},
-	{"Delete Non Existing Snapshot By Operator",
-		requestKind,
-		"foo",
-		"default",
-		admission.Delete,
-		userIsOperator(),
-		api.Snapshot{},
-		api.Snapshot{},
-		false,
-		true,
-	},
-	{"Delete Non Existing Snapshot By User",
-		requestKind,
-		"foo",
-		"default",
-		admission.Delete,
-		userIsHooman(),
 		api.Snapshot{},
 		api.Snapshot{},
 		false,
@@ -210,13 +156,14 @@ func sampleSnapshot() api.Snapshot {
 			APIVersion: api.SchemeGroupVersion.String(),
 		},
 		ObjectMeta: metaV1.ObjectMeta{
-			Name:      "foo",
+			Name:      "bar",
 			Namespace: "default",
 			Labels: map[string]string{
-				api.LabelDatabaseKind: api.ResourceKindSnapshot,
+				api.LabelDatabaseKind: api.ResourceKindMongoDB,
 			},
 		},
 		Spec: api.SnapshotSpec{
+			DatabaseName: "foo",
 			SnapshotStorageSpec: api.SnapshotStorageSpec{
 				Local: &api.LocalSpec{
 					MountPath: "/repo",
@@ -231,7 +178,7 @@ func sampleSnapshot() api.Snapshot {
 
 func getAwkwardSnapshot() api.Snapshot {
 	redis := sampleSnapshot()
-	redis.Spec =api.SnapshotSpec{
+	redis.Spec = api.SnapshotSpec{
 		DatabaseName: "foo",
 		SnapshotStorageSpec: api.SnapshotStorageSpec{
 			StorageSecretName: "foo-secret",
@@ -250,23 +197,40 @@ func editStatus(old api.Snapshot) api.Snapshot {
 	return old
 }
 
-func userIsOperator() authenticationV1.UserInfo {
-	return authenticationV1.UserInfo{
-		Username: "system:serviceaccount:kube-system:kubedb-operator",
-		Groups: []string{
-			"system:serviceaccounts",
-			"system:serviceaccounts:kube-system",
-			"system:authenticated",
+func sampleMongoDB() *api.MongoDB {
+	return &api.MongoDB{
+		TypeMeta: metaV1.TypeMeta{
+			Kind:       api.ResourceKindMongoDB,
+			APIVersion: api.SchemeGroupVersion.String(),
 		},
-	}
-}
-
-func userIsHooman() authenticationV1.UserInfo {
-	return authenticationV1.UserInfo{
-		Username: "minikube-user",
-		Groups: []string{
-			"system:masters",
-			"system:authenticated",
+		ObjectMeta: metaV1.ObjectMeta{
+			Name:      "foo",
+			Namespace: "default",
+			Labels: map[string]string{
+				api.LabelDatabaseKind: api.ResourceKindMongoDB,
+			},
+		},
+		Spec: api.MongoDBSpec{
+			Version:    "3.4",
+			DoNotPause: true,
+			Storage: &core.PersistentVolumeClaimSpec{
+				StorageClassName: types.StringP("standard"),
+				Resources: core.ResourceRequirements{
+					Requests: core.ResourceList{
+						core.ResourceStorage: resource.MustParse("100Mi"),
+					},
+				},
+			},
+			Init: &api.InitSpec{
+				ScriptSource: &api.ScriptSourceSpec{
+					VolumeSource: core.VolumeSource{
+						GitRepo: &core.GitRepoVolumeSource{
+							Repository: "https://github.com/kubedb/mongodb-init-scripts.git",
+							Directory:  ".",
+						},
+					},
+				},
+			},
 		},
 	}
 }

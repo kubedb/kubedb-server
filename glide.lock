@@ -1,5 +1,5 @@
-hash: 52c4f1573d898a63f533805a1cafa7d4195873c4e8b61c1b873d3d77fa149949
-updated: 2018-03-16T15:41:02.84242408+06:00
+hash: 8d55ad0936cb4cc2fa13a3680cf5a5ca0d6dcd91e72bef22c61e8ff4b6d27517
+updated: 2018-04-02T18:25:11.132939241-07:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
@@ -23,18 +23,25 @@ imports:
   - types
   - version
 - name: github.com/appscode/jsonpatch
-  version: 3e75a56b8967932466984d4432401e1c1a7ff61e
+  version: 58a38a46ddb591a543c6b1003213353e29331c5a
 - name: github.com/appscode/kube-mon
-  version: a670a5ff28df12938aa324b9f13683caeb216f8f
+  version: eeb8de0ba83795dc2fd86c3667d6566a62276160
   subpackages:
   - api
-- name: github.com/appscode/kutil
-  version: 3e1d387015c275db5fd3d605fcf1f61af6ab6866
+- name: github.com/appscode/kubernetes-webhook-util
+  version: bc38cfdad2cba8a14a06b1919347ff810286a46d
   subpackages:
-  - admission/api
-  - meta
+  - admission/v1beta1
   - registry/admissionreview/v1beta1
+- name: github.com/appscode/kutil
+  version: 83f1a2ee558a663702929a15ff7cfdfbfef331f1
+  subpackages:
+  - apiextensions/v1beta1
+  - core/v1
+  - meta
   - tools/analytics
+- name: github.com/appscode/mergo
+  version: e3000cb3d28c72b837601cac94debd91032d19fe
 - name: github.com/appscode/osm
   version: 97ececed243045a4d55a99b4ca126f1b65a7b596
   subpackages:
@@ -170,11 +177,6 @@ imports:
   - spew
 - name: github.com/dgrijalva/jwt-go
   version: 01aeca54ebda6e0fbfafd0a524d234159c05ec20
-- name: github.com/docker/distribution
-  version: edc3ab29cdff8694dd6feb85cfeb4b5f1b38ed9c
-  subpackages:
-  - digestset
-  - reference
 - name: github.com/elazarl/go-bindata-assetfs
   version: 3dcc96556217539f50599357fb481ac0dc7439b9
 - name: github.com/emicklei/go-restful
@@ -194,7 +196,7 @@ imports:
 - name: github.com/go-openapi/jsonreference
   version: 13c6e3589ad90f49bd3e3bbe2c2cb3d7a4142272
 - name: github.com/go-openapi/spec
-  version: d8000b5bfbd1147255710505a27c735b6b2ae2ac
+  version: 7abd5745472fff5eb3685386d5fb8bf38683154d
 - name: github.com/go-openapi/swag
   version: f3f9494671f93fcff853e3c6e9e948b3eb71e590
 - name: github.com/gogo/protobuf
@@ -203,7 +205,7 @@ imports:
   - proto
   - sortkeys
 - name: github.com/golang/glog
-  version: 23def4e6c14b4da8ac2ed8007337bc5eb5007998
+  version: 44145f04b68cf362d9c4df2182967c2275eaefed
 - name: github.com/golang/protobuf
   version: 1643683e1b54a9e88ad26d98f81400c8c9d9f4f9
   subpackages:
@@ -217,7 +219,7 @@ imports:
 - name: github.com/google/btree
   version: 7d79101e329e5a3adf994758c578dab82b90c017
 - name: github.com/google/go-cmp
-  version: 0c93777250bd58222171888d1651979319d8b381
+  version: 5411ab924f9ffa6566244a9e504bc347edacffd3
   subpackages:
   - cmp
   - cmp/internal/diff
@@ -226,7 +228,7 @@ imports:
 - name: github.com/google/gofuzz
   version: 44d81051d367757e1c7c6a5a86423ece9afcf63c
 - name: github.com/google/uuid
-  version: e367a344cbe8e08149f9951115dc299ebd42b919
+  version: dec09d789f3dba190787f8b4454c7d3c936fed9e
 - name: github.com/googleapis/gnostic
   version: 0c5108395e2debce0d731cf0287ddf7242066aba
   subpackages:
@@ -234,7 +236,7 @@ imports:
   - compiler
   - extensions
 - name: github.com/graymeta/stow
-  version: 6f2b8867a3fb15cca5507da1d552b55cfe5d07a7
+  version: 1df3851b8fc06f775b3daed2f19442b3c5b26a37
   repo: https://github.com/appscode/stow.git
   vcs: git
   subpackages:
@@ -278,7 +280,7 @@ imports:
 - name: github.com/juju/ratelimit
   version: 5b9ff866471762aa2ab2dced63c9fb6f53921342
 - name: github.com/kubedb/apimachinery
-  version: 37caef566d41ed47313b44975186c335dde08123
+  version: 3fc73e4362bbd370598eaddb845b6ecc9c07006e
   subpackages:
   - apis/kubedb
   - apis/kubedb/v1alpha1
@@ -287,6 +289,7 @@ imports:
   - client/clientset/versioned/scheme
   - client/clientset/versioned/typed/kubedb/v1alpha1
   - client/clientset/versioned/typed/kubedb/v1alpha1/fake
+  - client/clientset/versioned/typed/kubedb/v1alpha1/util
   - pkg/storage
   - pkg/validator
 - name: github.com/kubedb/elasticsearch
@@ -298,8 +301,9 @@ imports:
   subpackages:
   - pkg/validator
 - name: github.com/kubedb/mongodb
-  version: 558e60d7073eddb2ce9db7dfc6ce671bc25ae63b
+  version: 8adbd1bdb4c483347821f827d0ed16b369adff43
   subpackages:
+  - pkg/mutator
   - pkg/validator
 - name: github.com/kubedb/mysql
   version: b4b749dff97bd2ed8a91ae418be86e1bb1f03bbd
@@ -328,11 +332,9 @@ imports:
   subpackages:
   - flowrate
 - name: github.com/ncw/swift
-  version: ae9f0ea1605b9aa6434ed5c731ca35d83ba67c55
+  version: b2a7479cf26fa841ff90dd932d0221cb5c50782d
 - name: github.com/NYTimes/gziphandler
   version: 56545f4a5d46df9a6648819d1664c3a03a13ffdb
-- name: github.com/opencontainers/go-digest
-  version: a6d0ee40d4207ea02364bd3b9e8e77b9159ba1eb
 - name: github.com/pborman/uuid
   version: ca53cad383cad2479bbba7f7a1a05797ec1386e4
 - name: github.com/peterbourgon/diskv
@@ -374,11 +376,11 @@ imports:
 - name: github.com/sirupsen/logrus
   version: f006c2ac4710855cf0f916dd6b77acf6b048dc6e
 - name: github.com/spf13/cobra
-  version: c6c44e6fdcc30161c7f4480754da7230d01c06e3
+  version: 4dab30cb33e6633c33c787106bafbfbfdde7842d
   subpackages:
   - doc
 - name: github.com/spf13/pflag
-  version: ee5fd03fd6acfd43e44aea0b4135958546ed8e73
+  version: 1cd4a0c365d95803411bec89fb7b76bade17053b
 - name: github.com/ugorji/go
   version: ded73eae5db7e7a0ef6f55aace87a2873c5d2b74
   subpackages:
@@ -434,14 +436,14 @@ imports:
   - unicode/norm
   - width
 - name: google.golang.org/api
-  version: c24aa0e5ed34558ea50c016e4fb92c5e9aa69f2c
+  version: 3072d9cd7f79a11909b84fdb7c9c8b9e60a57fbd
   subpackages:
   - gensupport
   - googleapi
   - googleapi/internal/uritemplates
   - storage/v1
 - name: google.golang.org/appengine
-  version: 5bee14b453b4c71be47ec1781b0fa61c2ea182db
+  version: 4f7eeb5305a4ba1966344836ba4af9996b7b4e05
   subpackages:
   - internal
   - internal/app_identity
@@ -515,7 +517,8 @@ imports:
   subpackages:
   - pkg/apis/apiextensions
   - pkg/apis/apiextensions/v1beta1
-  - pkg/features
+  - pkg/client/clientset/clientset/scheme
+  - pkg/client/clientset/clientset/typed/apiextensions/v1beta1
 - name: k8s.io/apimachinery
   version: 180eddb345a5be3a157cea1c624700ad5bd27b8f
   subpackages:
@@ -555,6 +558,7 @@ imports:
   - pkg/util/httpstream
   - pkg/util/intstr
   - pkg/util/json
+  - pkg/util/jsonmergepatch
   - pkg/util/mergepatch
   - pkg/util/net
   - pkg/util/proxy
@@ -817,29 +821,6 @@ imports:
   - pkg/util/proto
 - name: k8s.io/kubernetes
   version: 925c127ec6b946659ad0fd596fa959be43f0cc05
-  subpackages:
-  - pkg/api/legacyscheme
-  - pkg/apis/apps
-  - pkg/apis/apps/install
-  - pkg/apis/apps/v1
-  - pkg/apis/apps/v1beta1
-  - pkg/apis/apps/v1beta2
-  - pkg/apis/autoscaling
-  - pkg/apis/batch
-  - pkg/apis/batch/install
-  - pkg/apis/batch/v1
-  - pkg/apis/batch/v1beta1
-  - pkg/apis/batch/v2alpha1
-  - pkg/apis/core
-  - pkg/apis/core/install
-  - pkg/apis/core/v1
-  - pkg/apis/extensions
-  - pkg/apis/extensions/install
-  - pkg/apis/extensions/v1beta1
-  - pkg/apis/networking
-  - pkg/features
-  - pkg/util/parsers
-  - pkg/util/pointer
 testImports:
 - name: github.com/stretchr/testify
   version: b91bfb9ebec76498946beb6af7c0230c7cc7ba6c

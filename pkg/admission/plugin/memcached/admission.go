@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 
-	hookapi "github.com/appscode/kutil/admission/api"
+	hookapi "github.com/appscode/kubernetes-webhook-util/admission/v1beta1"
 	meta_util "github.com/appscode/kutil/meta"
 	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	cs "github.com/kubedb/apimachinery/client/clientset/versioned"
@@ -83,7 +83,7 @@ func (a *MemcachedValidator) Admit(req *admission.AdmissionRequest) *admission.A
 		if err != nil {
 			return hookapi.StatusBadRequest(err)
 		}
-		if req.Operation == admission.Update && !util.IsKubeDBOperator(req.UserInfo) {
+		if req.Operation == admission.Update {
 			// validate changes made by user
 			oldObject, err := meta_util.UnmarshalFromJSON(req.OldObject.Raw, api.SchemeGroupVersion)
 			if err != nil {

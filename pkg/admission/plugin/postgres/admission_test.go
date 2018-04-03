@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"net/http"
-	"os"
 	"testing"
 
 	"github.com/appscode/go/types"
@@ -11,7 +10,6 @@ import (
 	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	extFake "github.com/kubedb/apimachinery/client/clientset/versioned/fake"
 	"github.com/kubedb/apimachinery/client/clientset/versioned/scheme"
-	"github.com/kubedb/kubedb-server/pkg/admission/util"
 	admission "k8s.io/api/admission/v1beta1"
 	authenticationV1 "k8s.io/api/authentication/v1"
 	core "k8s.io/api/core/v1"
@@ -26,8 +24,6 @@ import (
 
 func init() {
 	scheme.AddToScheme(clientSetScheme.Scheme)
-	os.Setenv(util.EnvSvcAccountName, "kubedb-operator")
-	os.Setenv("KUBE_NAMESPACE", "kube-system")
 }
 
 var requestKind = metaV1.GroupVersionKind{
@@ -72,7 +68,7 @@ func TestPostgresValidator_Admit(t *testing.T) {
 			req.Name = c.objectName
 			req.Namespace = c.namespace
 			req.Operation = c.operation
-			req.UserInfo = c.userInfo
+			req.UserInfo = authenticationV1.UserInfo{}
 			req.Object.Raw = objJS
 			req.OldObject.Raw = oldObjJS
 
@@ -109,205 +105,106 @@ var cases = []struct {
 	objectName string
 	namespace  string
 	operation  admission.Operation
-	userInfo   authenticationV1.UserInfo
 	object     api.Postgres
 	oldObject  api.Postgres
 	heatUp     bool
 	result     bool
 }{
-	{"Create Valid Postgres By User",
+	{"Create Valid Postgres",
 		requestKind,
 		"foo",
 		"default",
 		admission.Create,
-		userIsHooman(),
 		samplePostgres(),
 		api.Postgres{},
 		false,
 		true,
 	},
-	{"Create Invalid Postgres By User",
+	{"Create Invalid Postgres",
 		requestKind,
 		"foo",
 		"default",
 		admission.Create,
-		userIsHooman(),
 		getAwkwardPostgres(),
 		api.Postgres{},
 		false,
 		false,
 	},
-	{"Create Invalid Postgres By Operator",
-		requestKind,
-		"foo",
-		"default",
-		admission.Create,
-		userIsHooman(),
-		getAwkwardPostgres(),
-		api.Postgres{},
-		false,
-		false,
-	},
-	{"Edit Postgres Spec.DatabaseSecret By User",
+	{"Edit Postgres Spec.DatabaseSecret",
 		requestKind,
 		"foo",
 		"default",
 		admission.Update,
-		userIsHooman(),
 		editSpecSecret(samplePostgres()),
 		samplePostgres(),
 		false,
 		false,
 	},
-	{"Edit Postgres Spec.DatabaseSecret By Operator",
+	{"Edit Status",
 		requestKind,
 		"foo",
 		"default",
 		admission.Update,
-		userIsOperator(),
-		editSpecSecret(samplePostgres()),
-		samplePostgres(),
-		false,
-		true,
-	},
-	{"Edit Status By User",
-		requestKind,
-		"foo",
-		"default",
-		admission.Update,
-		userIsHooman(),
-		editStatus(samplePostgres()),
-		samplePostgres(),
-		false,
-		false,
-	},
-	{"Edit Status By Operator",
-		requestKind,
-		"foo",
-		"default",
-		admission.Update,
-		userIsOperator(),
 		editStatus(samplePostgres()),
 		samplePostgres(),
 		false,
 		true,
 	},
-	{"Edit Spec.Monitor By User",
+	{"Edit Spec.Monitor",
 		requestKind,
 		"foo",
 		"default",
 		admission.Update,
-		userIsHooman(),
 		editSpecMonitor(samplePostgres()),
 		samplePostgres(),
 		false,
 		true,
 	},
-	{"Edit Spec.Monitor By Operator",
+	{"Edit Invalid Spec.Monitor",
 		requestKind,
 		"foo",
 		"default",
 		admission.Update,
-		userIsOperator(),
-		editSpecMonitor(samplePostgres()),
-		samplePostgres(),
-		false,
-		true,
-	},
-	{"Edit Invalid Spec.Monitor By User",
-		requestKind,
-		"foo",
-		"default",
-		admission.Update,
-		userIsHooman(),
 		editSpecInvalidMonitor(samplePostgres()),
 		samplePostgres(),
 		false,
 		false,
 	},
-	{"Edit Invalid Spec.Monitor By Operator",
+	{"Edit Spec.DoNotPause",
 		requestKind,
 		"foo",
 		"default",
 		admission.Update,
-		userIsOperator(),
-		editSpecInvalidMonitor(samplePostgres()),
-		samplePostgres(),
-		false,
-		false,
-	},
-	{"Edit Spec.DoNotPause By User",
-		requestKind,
-		"foo",
-		"default",
-		admission.Update,
-		userIsHooman(),
 		editSpecDoNotPause(samplePostgres()),
 		samplePostgres(),
 		false,
 		true,
 	},
-	{"Delete Mongodb when Spec.DoNotPause=true by Operator",
+	{"Delete Postgres when Spec.DoNotPause=true",
 		requestKind,
 		"foo",
 		"default",
 		admission.Delete,
-		userIsOperator(),
 		samplePostgres(),
 		api.Postgres{},
 		true,
 		false,
 	},
-	{"Delete Mongodb when Spec.DoNotPause=true by User",
+	{"Delete Postgres when Spec.DoNotPause=false",
 		requestKind,
 		"foo",
 		"default",
 		admission.Delete,
-		userIsHooman(),
-		samplePostgres(),
-		api.Postgres{},
-		true,
-		false,
-	},
-	{"Delete Mongodb when Spec.DoNotPause=false by Operator",
-		requestKind,
-		"foo",
-		"default",
-		admission.Delete,
-		userIsOperator(),
 		editSpecDoNotPause(samplePostgres()),
 		api.Postgres{},
 		true,
 		true,
 	},
-	{"Delete Mongodb when Spec.DoNotPause=false by User",
+	{"Delete Non Existing Postgres",
 		requestKind,
 		"foo",
 		"default",
 		admission.Delete,
-		userIsHooman(),
-		editSpecDoNotPause(samplePostgres()),
-		api.Postgres{},
-		true,
-		true,
-	},
-	{"Delete Non Existing Postgres By Operator",
-		requestKind,
-		"foo",
-		"default",
-		admission.Delete,
-		userIsOperator(),
-		api.Postgres{},
-		api.Postgres{},
-		false,
-		true,
-	},
-	{"Delete Non Existing Postgres By User",
-		requestKind,
-		"foo",
-		"default",
-		admission.Delete,
-		userIsHooman(),
 		api.Postgres{},
 		api.Postgres{},
 		false,
@@ -343,7 +240,7 @@ func samplePostgres() api.Postgres {
 				ScriptSource: &api.ScriptSourceSpec{
 					VolumeSource: core.VolumeSource{
 						GitRepo: &core.GitRepoVolumeSource{
-							Repository: "https://github.com/kubedb/mongodb-init-scripts.git",
+							Repository: "https://github.com/kubedb/postgres-init-scripts.git",
 							Directory:  ".",
 						},
 					},
@@ -354,9 +251,9 @@ func samplePostgres() api.Postgres {
 }
 
 func getAwkwardPostgres() api.Postgres {
-	mongodb := samplePostgres()
-	mongodb.Spec.Version = "3.0"
-	return mongodb
+	postgres := samplePostgres()
+	postgres.Spec.Version = "3.0"
+	return postgres
 }
 
 func editSpecSecret(old api.Postgres) api.Postgres {
@@ -391,25 +288,4 @@ func editSpecInvalidMonitor(old api.Postgres) api.Postgres {
 func editSpecDoNotPause(old api.Postgres) api.Postgres {
 	old.Spec.DoNotPause = false
 	return old
-}
-
-func userIsOperator() authenticationV1.UserInfo {
-	return authenticationV1.UserInfo{
-		Username: "system:serviceaccount:kube-system:kubedb-operator",
-		Groups: []string{
-			"system:serviceaccounts",
-			"system:serviceaccounts:kube-system",
-			"system:authenticated",
-		},
-	}
-}
-
-func userIsHooman() authenticationV1.UserInfo {
-	return authenticationV1.UserInfo{
-		Username: "minikube-user",
-		Groups: []string{
-			"system:masters",
-			"system:authenticated",
-		},
-	}
 }

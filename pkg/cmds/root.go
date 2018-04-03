@@ -63,7 +63,7 @@ func NewRootCmd(version string) *cobra.Command {
 	cmd := server.NewCommandStartAdmissionServer(os.Stdout, os.Stderr, stopCh,
 		&elasticsearch.ElasticsearchValidator{},
 		&memcached.MemcachedValidator{},
-		&mongodb.MongoDBValidator{},
+		&mongodb.MongoDBValidator{}, &mongodb.MongoDBMutator{},
 		&mysql.MySQLValidator{},
 		&postgres.PostgresValidator{},
 		&redis.RedisValidator{},
