@@ -5,7 +5,7 @@ import (
 	"net"
 
 	hookapi "github.com/appscode/kubernetes-webhook-util/admission/v1beta1"
-	"github.com/kubedb/kubedb-server/pkg/apiserver"
+	"github.com/kubedb/kubedb-server/pkg/server"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	admissionv1beta1 "k8s.io/api/admission/v1beta1"
@@ -27,7 +27,7 @@ type AdmissionServerOptions struct {
 func NewAdmissionServerOptions(out, errOut io.Writer, admissionHooks ...hookapi.AdmissionHook) *AdmissionServerOptions {
 	o := &AdmissionServerOptions{
 		// TODO we will nil out the etcd storage options.  This requires a later level of k8s.io/apiserver
-		RecommendedOptions: genericoptions.NewRecommendedOptions(defaultEtcdPathPrefix, apiserver.Codecs.LegacyCodec(admissionv1beta1.SchemeGroupVersion)),
+		RecommendedOptions: genericoptions.NewRecommendedOptions(defaultEtcdPathPrefix, server.Codecs.LegacyCodec(admissionv1beta1.SchemeGroupVersion)),
 
 		AdmissionHooks: admissionHooks,
 
@@ -74,20 +74,20 @@ func (o *AdmissionServerOptions) Complete() error {
 	return nil
 }
 
-func (o AdmissionServerOptions) Config() (*apiserver.Config, error) {
+func (o AdmissionServerOptions) Config() (*server.Config, error) {
 	// TODO have a "real" external address
 	if err := o.RecommendedOptions.SecureServing.MaybeDefaultWithSelfSignedCerts("localhost", nil, []net.IP{net.ParseIP("127.0.0.1")}); err != nil {
 		return nil, errors.Errorf("error creating self-signed certificates: %v", err)
 	}
 
-	serverConfig := genericapiserver.NewRecommendedConfig(apiserver.Codecs)
+	serverConfig := genericapiserver.NewRecommendedConfig(server.Codecs)
 	if err := o.RecommendedOptions.ApplyTo(serverConfig); err != nil {
 		return nil, err
 	}
 
-	config := &apiserver.Config{
+	config := &server.Config{
 		GenericConfig: serverConfig,
-		ExtraConfig: apiserver.ExtraConfig{
+		ExtraConfig: server.ExtraConfig{
 			AdmissionHooks: o.AdmissionHooks,
 			ClientConfig:   serverConfig.ClientConfig,
 		},

@@ -36,7 +36,7 @@ var (
 
 func NewRootCmd(version string) *cobra.Command {
 	var rootCmd = &cobra.Command{
-		Use:               "apiserver",
+		Use:               "server",
 		DisableAutoGenTag: true,
 		PersistentPreRun: func(c *cobra.Command, args []string) {
 			c.Flags().VisitAll(func(flag *pflag.Flag) {
@@ -72,7 +72,7 @@ func NewRootCmd(version string) *cobra.Command {
 		&dormantdatabase.DormantDatabaseValidator{},
 	)
 	cmd.Use = "run"
-	cmd.Long = "Launch KubeDB apiserver"
+	cmd.Long = "Launch KubeDB server"
 	cmd.Short = cmd.Long
 	rootCmd.AddCommand(cmd)
 
